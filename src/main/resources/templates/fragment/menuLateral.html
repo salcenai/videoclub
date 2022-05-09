@@ -1,0 +1,13 @@
+<div class="p-2 bg-dark text-white">
+    <a href="/busqueda">Búsqueda avanzada</a>
+
+    <hr>
+
+    <a href="/nuevaPelicula">Añadir nueva película</a>
+
+    <hr>
+
+    <div th:each="genero : ${T(org.example.videoclub.models.assist.EGenero).values()}">
+        <a th:href="${genero.codigo}" th:text="${genero.nombre}"></a>
+    </div>
+</div>

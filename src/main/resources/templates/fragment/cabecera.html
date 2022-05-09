@@ -1,0 +1,22 @@
+<nav class="navbar navbar-dark bg-dark text-white justify-content-around">
+
+    <div class="container">
+
+        <a href="/"><h1>Videoclub</h1></a>
+
+        <div>
+            <div th:if="${#request.remoteUser == null}">
+                <a th:href="@{/login}">Iniciar Sesión</a>
+                <span>/</span>
+                <a th:href="@{/registro}">Registrarse</a>
+            </div>
+            <div th:unless="${#request.remoteUser == null}">
+                <a href="/perfil" th:inline="text">[[${#request.remoteUser}]]</a>
+                <span>/</span>
+                <a href="/logout">Cerrar Sesión</a>
+            </div>
+        </div>
+
+    </div>
+
+</nav>

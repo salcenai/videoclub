@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Videoclub</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">-->
+
+    <link rel="stylesheet" type="text/css" href="/css/videoclub.css" />
+
+    <!-- JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!--    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="/js/videoclub.js"></script>
+    <script type="text/javascript" src="/js/peliculas.js"></script>
+
+    <script>
+
+        $( document ).ready(function() {
+            console.log("ready!");
+
+            $('#txtTitulo').keyup(function(event){
+
+                var titulo = $('#txtTitulo').val().toLowerCase();
+
+                titulo = titulo.replaceAll("á", "a");
+                titulo = titulo.replaceAll("é", "e");
+                titulo = titulo.replaceAll("í", "i");
+                titulo = titulo.replaceAll("ó", "o");
+                titulo = titulo.replaceAll("ú", "u");
+                titulo = titulo.replaceAll(/[^a-zA-Z ]/g, "");
+                titulo = titulo.replaceAll(" ", "_");
+
+                $('#txtTituloCompacto').val(titulo);
+            });
+
+            $('#selGenerosCandidatos > option').click(function(event){
+                if(this.parentNode.id == 'selGeneros'){
+                    $('#selGenerosCandidatos').append(this);
+                } else {
+                    $('#selGeneros').append(this);
+                }
+            });
+
+            $('#selSubgenerosCandidatos > option').click(function(event){
+                if(this.parentNode.id == 'selSubgeneros'){
+                    $('#selSubgenerosCandidatos').append(this);
+                } else {
+                    $('#selSubgeneros').append(this);
+                }
+            });
+
+        });
+
+    </script>
+
+</head>
+<body>
+
+<div th:include="/fragment/cabeceraSimple"></div>
+
+<div id="idContenedor" class="container">
+
+    <hr>
+
+    <form id="formNuevaPelicula">
+
+        <div class="form-row justify-content-center">
+            <span id="lblMensaje" class="text-danger"></span>
+        </div>
+
+        <div class="form-row mb-3">
+            <div class="col-md-6">
+                <label for="txtTitulo">Título:</label>
+                <input type="text" id="txtTitulo" class="form-control" autofocus="autofocus" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="selPais">País</label>
+                <select id="selPais" class="custom-select">
+                    <option value="" selected>Cualquier país</option>
+                    <option th:each="pais : ${T(org.example.videoclub.models.assist.EPais).values()}"
+                            th:value="${pais.codigo}" th:text="${pais.nombre}"></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row mb-3">
+            <div class="col-md-6">
+                <label for="txtTituloCompacto">Título compacto: (En minúsculas y sin espacios)</label>
+                <input type="text" id="txtTituloCompacto" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label for="numAnio">Año:</label>
+                <input id="numAnio" type="number" min="1895" max="2030" step="1" value="2022" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label for="numDuracion">Duracion: (En minutos)</label>
+                <input id="numDuracion" type="number" min="1" max="500" step="1" value="90" class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-row mb-3">
+
+            <div class="col-md-3">
+                <label for="selGeneros">Géneros:</label>
+                <select id="selGeneros" class="custom-select mb-3" size="5"></select>
+
+                <select id="selGenerosCandidatos" class="custom-select" size="10">
+                    <option th:each="genero : ${T(org.example.videoclub.models.assist.EGenero).values()}"
+                            th:value="${genero.codigo}" th:text="${genero.nombre}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="selSubgeneros">Subgéneros:</label>
+                <select id="selSubgeneros" class="custom-select mb-3" multiple size="5"></select>
+
+                <select id="selSubgenerosCandidatos" class="custom-select" size="10">
+                    <option th:each="subgenero : ${T(org.example.videoclub.models.assist.ESubgenero).values()}"
+                            th:value="${subgenero.codigo}" th:text="${subgenero.nombre}"></option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="txtSinopsis">Sinopsis:</label>
+                <textarea id="txtSinopsis" class="form-control" rows="15"/></textarea>
+            </div>
+        </div>
+
+        <div class="form-row mb-3 justify-content-around">
+            <input type="button" onclick="nuevaPelicula()" class="btn btn-primary" value="Nueva película" />
+        </div>
+
+    </form>
+
+</div>
+</body>
+</html>

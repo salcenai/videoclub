@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Videoclub</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">-->
+
+    <link rel="stylesheet" type="text/css" href="/css/videoclub.css" />
+
+    <!-- JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!--    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="/js/videoclub.js"></script>
+    <script type="text/javascript" src="/js/estados.js"></script>
+
+    <script>
+
+        var idPelicula = [[${pelicula.id}]];
+
+        $( document ).ready(function() {
+            console.log("ready!");
+
+            if($('#selTipoEstado').val() == 'VISTA'){
+                $('#divPuntuacion').show();
+                $('#divCritica').show();
+            } else {
+                $('#divPuntuacion').hide();
+                $('#divCritica').hide();
+            }
+
+            $('#selTipoEstado').change(function(event){
+                if($('#selTipoEstado').val() == 'VISTA'){
+                    $('#divPuntuacion').show();
+                    $('#divCritica').show();
+                } else {
+                    $('#divPuntuacion').hide();
+                    $('#divCritica').hide();
+                    $('#numPuntuacion').val('');
+                    $('#txtCritica').val('');
+                }
+
+            });
+
+        });
+
+    </script>
+
+</head>
+<body>
+
+    <div th:include="/fragment/cabecera"></div>
+
+    <div id="idContenedor" class="container">
+
+        <!-- Modal -->
+        <div class="modal fade" id="modCambiarEstado" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">[[${pelicula.titulo}]]</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="form-row mb-3">
+                            <div class="col-md-6">
+                                <label for="selTipoEstado">¿La has visto?</label>
+                                <select id="selTipoEstado" class="custom-select" size="1">
+                                    <option th:each="tipoEstado : ${T(org.example.videoclub.models.assist.ETipoEstado).values()}"
+                                            th:value="${tipoEstado.codigo}" th:text="${tipoEstado.nombre}"
+                                            th:selected="${pelicula.criticaPersonal != null and pelicula.criticaPersonal.codigoTipoEstado != null and tipoEstado.codigo == pelicula.criticaPersonal.codigoTipoEstado}"></option>
+                                </select>
+                            </div>
+
+                            <div id="divPuntuacion" class="col-md-6">
+                                <label for="numPuntuacion">Puntuación:</label>
+                                <input th:if="${pelicula.criticaPersonal != null
+                                    and pelicula.criticaPersonal.puntuacion != null}" id="numPuntuacion" type="number" class="form-control" placeholder="Puntuación sobre 100" th:value="${pelicula.criticaPersonal.puntuacion}" min="0" max="100" step="1" maxlength="3" size="3" />
+                                <input th:if="${pelicula.criticaPersonal == null
+                                    or pelicula.criticaPersonal.puntuacion == null}" id="numPuntuacion" type="number" class="form-control" placeholder="Puntuación sobre 100" min="0" max="100" step="1"  maxlength="3" size="3" />
+                            </div>
+                        </div>
+                        <div class="form-row mb-3">
+                            <div id="divCritica" class="col-md-12">
+                                <label for="txtCritica">Crítica:</label>
+                                <textarea id="txtCritica" th:if="${pelicula.criticaPersonal != null
+                                        and pelicula.criticaPersonal.critica != null}" placeholder="Escribe tu crítica" class="form-control" rows="5">[[${pelicula.criticaPersonal.critica}]]</textarea>
+                                <textarea id="txtCritica" th:if="${pelicula.criticaPersonal == null
+                                        or pelicula.criticaPersonal.critica == null}" placeholder="Escribe tu crítica" class="form-control" rows="5"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="cambiarEstadoPelicula()">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+
+            <div class="col-8 p-2">
+
+                <div class="row justify-content-center">
+                    <h1>[[${pelicula.titulo}]]</h1>
+                </div>
+
+                <hr>
+
+                <div class="row p-1">
+                    <span class="text-muted">Año:&nbsp;</span>
+                    <span>[[${pelicula.anio}]]&nbsp;</span>
+                    <span class="text-muted">Duración:&nbsp;</span>
+                    <span>[[${pelicula.duracion}]]&nbsp;minutos</span>
+                </div>
+
+                <div class="row p-1">
+                    <span class="text-muted">Pais:&nbsp;</span>
+                    <div>
+                        <span th:text="${pelicula.pais}"></span>
+                        <img class="rounded" th:src="'/images/bandera/bandera_' + ${pelicula.codigoPais} + '.png'" th:alt="${pelicula.pais}" style="max-height:16px;" />
+                    </div>
+                </div>
+
+                <div class="row p-1">
+                    <span class="text-muted">Géneros:&nbsp;</span>
+                    <span th:each="genero,iterStat : ${pelicula.mapGeneros}">
+                        <a th:href="'/pelicula/' + ${genero.key}">[[${genero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    </span>
+                    <span class="text-muted">Subgéneros:&nbsp;</span>
+                    <span th:each="subgenero,iterStat : ${pelicula.mapSubgeneros}">
+                        <a th:href="'/pelicula/' + ${subgenero.key}">[[${subgenero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    </span>
+                </div>
+
+                <div class="row p-1">
+                    <span class="text-muted">Sinopsis:&nbsp;</span>
+                    <span>[[${pelicula.sinopsis}]]</span>
+                </div>
+
+                <hr>
+
+                <div>
+                    <div class="row p-1">
+                        <span class="text-muted">Dirección:&nbsp;</span>
+                        <span>BLABLABLA</span>
+                    </div>
+                    <div class="row p-1">
+                        <span class="text-muted">Guión:&nbsp;</span>
+                        <span>TOCOTO</span>
+                    </div>
+                    <div class="row p-1">
+                        <span class="text-muted">Reparto:&nbsp;</span>
+                        <span>TIRURI</span>
+                    </div>
+                    <div class="row p-1">
+                        <span class="text-muted">Productor:&nbsp;</span>
+                        <span>TIRURI</span>
+                    </div>
+                    <div class="row p-1">
+                        <span class="text-muted">Banda sonora:&nbsp;</span>
+                        <span>TIRURI</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="col-4 p-2">
+                <div class="row p-2">
+                    <img class="card-img" th:src="'/images/portada/portada_' + ${pelicula.tituloCompacto} + '.jpg'" th:alt="${pelicula.titulo}" />
+                </div>
+
+                <hr>
+
+                <div class="row p-2 justify-content-around align-items-center">
+                    <div th:if="${pelicula.puntuacionMedia != null}">
+                        <span th:if="${pelicula.puntuacionMedia >= 70}" class="px-1 rounded bg-success text-white">[[${pelicula.puntuacionMedia}]]/100</span>
+                        <span th:if="${pelicula.puntuacionMedia >= 50 and pelicula.puntuacionMedia < 70}" class="px-1 rounded bg-warning text-white">[[${pelicula.puntuacionMedia}]]/100</span>
+                        <span th:if="${pelicula.puntuacionMedia < 50}" class="px-1 rounded bg-danger text-white">[[${pelicula.puntuacionMedia}]]/100</span>
+                        <i class="align-middle">([[${pelicula.numVotos}]]) votos</i>
+                    </div>
+
+                    <!-- Button trigger modal -->
+                    <div>
+                        <button th:if="${pelicula.criticaPersonal == null or pelicula.criticaPersonal.codigoTipoEstado eq 'NINGUNO'}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modCambiarEstado">
+                            No la he visto
+                        </button>
+                        <button  th:if="${pelicula.criticaPersonal != null
+                            and pelicula.criticaPersonal.codigoTipoEstado == 'PENDIENTE'}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modCambiarEstado">
+                            Quiero verla
+                        </button>
+                        <button th:if="${pelicula.criticaPersonal != null
+                            and pelicula.criticaPersonal.codigoTipoEstado == 'VISTA'
+                            and pelicula.criticaPersonal.puntuacion == null}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modCambiarEstado">
+                            Ya la he visto
+                        </button>
+                    </div>
+                    <div th:if="${pelicula.criticaPersonal != null
+                            and pelicula.criticaPersonal.codigoTipoEstado == 'VISTA'
+                            and pelicula.criticaPersonal.puntuacion != null}">
+                        <button th:if="${pelicula.criticaPersonal.puntuacion >= 70}" type="button" class="btn btn-success" data-toggle="modal" data-target="#modCambiarEstado">
+                            [[${pelicula.criticaPersonal.puntuacion}]]/100
+                        </button>
+                        <button th:if="${pelicula.criticaPersonal.puntuacion >= 50 and pelicula.criticaPersonal.puntuacion < 70}" type="button" class="btn btn-warning" data-toggle="modal" data-target="#modCambiarEstado">
+                            [[${pelicula.criticaPersonal.puntuacion}]]/100
+                        </button>
+                        <button th:if="${pelicula.criticaPersonal.puntuacion < 50}" type="button" class="btn btn-danger" data-toggle="modal" data-target="#modCambiarEstado">
+                            [[${pelicula.criticaPersonal.puntuacion}]]/100
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="row p-1">
+                <span class="text-muted">Críticas:&nbsp;</span>
+            </div>
+
+            <div th:each="critica : ${pelicula.lstCriticas}" class="row p-1">
+                <blockquote class="blockquote">
+                    <p class="mb-0">[[${critica.critica}]]</p>
+                    <footer class="blockquote-footer">
+                        <span>[[${critica.nombreUsuario}]]</span>
+                        <span th:if="${critica.puntuacion >= 70}" class="px-1 rounded bg-success text-white align-middle">[[${critica.puntuacion}]]/100</span>
+                        <span th:if="${critica.puntuacion >= 50 and critica.puntuacion < 70}" class="px-1 rounded bg-warning text-white align-middle">[[${critica.puntuacion}]]/100</span>
+                        <span th:if="${critica.puntuacion < 50}" class="px-1 rounded bg-danger text-white align-middle">[[${critica.puntuacion}]]/100</span>
+                        <cite>[[${critica.fecha}]]</cite>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
