@@ -190,7 +190,7 @@ public enum EPais {
 //    Reunion("REU", "Reunión"),
 //    Rumania("ROU", "Rumanía"),
 //    SerbiaYMontenegro("SRB", "Serbia y Montenegro"),
-//    Rusia("RUS", "Rusia"),
+    Rusia("RUS", "Rusia"),
 //    Ruanda("RWA", "Ruanda"),
 //    ArabiaSaudita("SAU", "Arabia Saudita"),
 //    IslasSolomon("SLB", "Islas Solomón"),

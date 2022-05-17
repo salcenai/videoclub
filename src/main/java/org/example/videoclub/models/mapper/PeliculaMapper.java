@@ -4,17 +4,16 @@ import org.example.videoclub.models.Estado;
 import org.example.videoclub.models.Genero;
 import org.example.videoclub.models.Pais;
 import org.example.videoclub.models.Pelicula;
-import org.example.videoclub.models.dto.PeliculaCompletaDTO;
-import org.example.videoclub.models.dto.PeliculaDTO;
-import org.example.videoclub.models.dto.PeliculaMiniaturaDTO;
-import org.example.videoclub.models.dto.PeliculaNuevaDTO;
+import org.example.videoclub.models.dto.*;
 import org.example.videoclub.repositories.EstadoRepository;
 import org.example.videoclub.repositories.GeneroRepository;
 import org.example.videoclub.repositories.PaisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
@@ -31,6 +30,8 @@ public class PeliculaMapper {
 
     @Autowired
     EstadoMapper estadoMapper;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
     public Pelicula peliculaDTOtoPelicula(
             PeliculaDTO pDTO){
@@ -106,8 +107,31 @@ public class PeliculaMapper {
         pMDTO.setTituloCompacto(p.getTituloCompacto());
         pMDTO.setTitulo(p.getTitulo());
         pMDTO.setAnio(p.getAnio());
+        pMDTO.setPuntuacionMedia(p.getPuntuacionMedia());
 
         return pMDTO;
+    }
+
+    public PeliculaMiniaturaDTO peliculaToPeliculaMiniaturaDTO(
+            Pelicula p,
+            String nombreUsuario){
+
+        PeliculaMiniaturaDTO peliculaMiniaturaDTO = new PeliculaMiniaturaDTO();
+        peliculaMiniaturaDTO.setId(p.getId());
+        peliculaMiniaturaDTO.setTituloCompacto(p.getTituloCompacto());
+        peliculaMiniaturaDTO.setTitulo(p.getTitulo());
+        peliculaMiniaturaDTO.setAnio(p.getAnio());
+        peliculaMiniaturaDTO.setPuntuacionMedia(p.getPuntuacionMedia());
+
+        if(nombreUsuario != null){
+            Optional<Estado> estado = estadoRepository.findByIdPeliculaAndNombreUsuario(p.getId(), nombreUsuario);
+            if(estado.isPresent()){
+                peliculaMiniaturaDTO.setPuntuacionPersonal(estado.get().getPuntuacion());
+                peliculaMiniaturaDTO.setFecha(sdf.format(estado.get().getFecha()));
+            }
+        }
+
+        return peliculaMiniaturaDTO;
     }
 
     public List<PeliculaMiniaturaDTO> peliculatopeliculaMiniaturaDTO(
@@ -139,7 +163,7 @@ public class PeliculaMapper {
         pcDTO.setAnio(p.getAnio());
         pcDTO.setDuracion(p.getDuracion());
         pcDTO.setSinopsis(p.getSinopsis());
-        pcDTO.setPuntuacionMedia(p.getPuntuacionMedia() != null ? p.getPuntuacionMedia().setScale(1, RoundingMode.HALF_EVEN) : null);
+        pcDTO.setPuntuacionMedia(p.getPuntuacionMedia());
         pcDTO.setNumVotos(p.getNumVotos());
 
         List<Genero> lstGeneros = generoRepository.findByIdPelicula(p.getId());
@@ -162,6 +186,26 @@ public class PeliculaMapper {
         pcDTO.setLstCriticas(estadoMapper.estadoToCriticaDTO(lstEstado));
 
         return pcDTO;
+    }
+
+    public PaginaPeliculasMiniaturaDTO pagePeliculasToPaginaPeliculasMiniaturaDTO(
+            Page<Pelicula> pagePeliculas,
+            String nombreUsuario) {
+
+        List<PeliculaMiniaturaDTO> lstPeliculaMiniaturaDTO = new ArrayList<>();
+
+        for(Pelicula p: pagePeliculas.getContent()){
+            lstPeliculaMiniaturaDTO.add(peliculaToPeliculaMiniaturaDTO(p, nombreUsuario));
+        }
+
+        PaginaPeliculasMiniaturaDTO paginaPeliculasMiniaturaDTO = new PaginaPeliculasMiniaturaDTO();
+
+        paginaPeliculasMiniaturaDTO.setPeliculas(lstPeliculaMiniaturaDTO);
+        paginaPeliculasMiniaturaDTO.setPaginaActual(pagePeliculas.getNumber());
+        paginaPeliculasMiniaturaDTO.setTotalPaginas(pagePeliculas.getTotalPages());
+        paginaPeliculasMiniaturaDTO.setTotalPeliculas(pagePeliculas.getTotalElements());
+
+        return paginaPeliculasMiniaturaDTO;
     }
 
 }

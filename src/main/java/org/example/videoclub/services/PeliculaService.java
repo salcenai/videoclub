@@ -6,6 +6,7 @@ import org.example.videoclub.models.Estado;
 import org.example.videoclub.models.Genero;
 import org.example.videoclub.models.GeneroPelicula;
 import org.example.videoclub.models.Pelicula;
+import org.example.videoclub.models.dto.PaginaPeliculasMiniaturaDTO;
 import org.example.videoclub.models.dto.PeliculaCompletaDTO;
 import org.example.videoclub.models.dto.PeliculaNuevaDTO;
 import org.example.videoclub.models.mapper.EstadoMapper;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -50,15 +52,13 @@ public class PeliculaService {
 
     public PeliculaCompletaDTO obtenerPeliculaCompleta(Long idPelicula, String nombreUsuario) throws PeliculaNoEncontradaException {
 
-        PeliculaCompletaDTO pCDTO = new PeliculaCompletaDTO();
-
         Optional<Pelicula> p = peliculaRepository.findById(idPelicula);
 
         if(!p.isPresent()){
             throw new PeliculaNoEncontradaException("La pelicula " + idPelicula + " no ha sido encontrada");
         }
 
-        pCDTO = peliculaMapper.peliculaToPeliculaCompletaDTO(p.get());
+        PeliculaCompletaDTO pCDTO = peliculaMapper.peliculaToPeliculaCompletaDTO(p.get());
 
         Optional<Estado> e = estadoRepository.findByIdPeliculaAndNombreUsuario(idPelicula, nombreUsuario);
 
@@ -69,13 +69,29 @@ public class PeliculaService {
         return pCDTO;
     }
 
-    public Page<Pelicula> obtenerPeliculas(Pageable page){
-        return peliculaRepository.findAll(page);
+    public PaginaPeliculasMiniaturaDTO busquedaMiniaturaPeliculas(
+            String busqueda,
+            String nombreUsuario,
+            Pageable pagina){
+
+        Page<Pelicula> pagePeliculas = peliculaRepository.findByTituloContaining(busqueda, pagina);
+
+        return peliculaMapper.pagePeliculasToPaginaPeliculasMiniaturaDTO(pagePeliculas, nombreUsuario);
     }
 
-    public Page<Pelicula> busquedaPeliculas(String busqueda, Pageable pagina){
+    public PaginaPeliculasMiniaturaDTO busquedaMiniaturaPeliculasPorUsuario(
+            String busqueda,
+            String nombreUsuario,
+            String codigoTipoEstado,
+            Pageable paging){
 
-        return peliculaRepository.findByTituloContaining(busqueda, pagina);
+        Page<Pelicula> pagePeliculas = peliculaRepository.findByTituloContainingAndNombreUsuarioAndCodigoTipoEstadoOrderByFechaEstadoDesc(
+                busqueda,
+                nombreUsuario,
+                codigoTipoEstado,
+                paging);
+
+        return peliculaMapper.pagePeliculasToPaginaPeliculasMiniaturaDTO(pagePeliculas, nombreUsuario);
     }
 
     public Pelicula guardarPelicula(Pelicula pelicula){
@@ -155,7 +171,7 @@ public class PeliculaService {
             throw new PeliculaNoEncontradaException("La pelicula " + idPelicula + " no ha sido encontrada");
         }
 
-        Optional<BigDecimal> puntuacionMedia = estadoRepository.avgPuntuacionByIdPelicula(idPelicula);
+        Optional<Integer> puntuacionMedia = estadoRepository.avgPuntuacionByIdPelicula(idPelicula);
         if(puntuacionMedia.isPresent()){
             pelicula.get().setPuntuacionMedia(puntuacionMedia.get());
         } else {

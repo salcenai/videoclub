@@ -1,12 +1,10 @@
 package org.example.videoclub.controllers;
 
+import com.sun.istack.NotNull;
 import org.example.videoclub.errors.PeliculaExistenteException;
 import org.example.videoclub.errors.PeliculaNoEncontradaException;
 import org.example.videoclub.models.Pelicula;
-import org.example.videoclub.models.dto.PeliculaCompletaDTO;
-import org.example.videoclub.models.dto.PeliculaDTO;
-import org.example.videoclub.models.dto.PeliculaMiniaturaDTO;
-import org.example.videoclub.models.dto.PeliculaNuevaDTO;
+import org.example.videoclub.models.dto.*;
 import org.example.videoclub.models.mapper.PeliculaMapper;
 import org.example.videoclub.services.PeliculaService;
 import org.slf4j.Logger;
@@ -19,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -66,33 +65,21 @@ public class PeliculaRestController {
     }
 
     @GetMapping("/buscarPeliculas")
-    public ResponseEntity<Map<String, Object>> buscarPeliculas(
+    public ResponseEntity<PaginaPeliculasMiniaturaDTO> buscarPeliculas(
             @RequestParam(defaultValue = "") String busqueda,
-            @RequestParam(defaultValue = PAGINA_POR_DEFECTO) int nPagina,
-            @RequestParam(defaultValue = ELEMENTOS_POR_PAGINA) int size){
+            @RequestParam(defaultValue = PAGINA_POR_DEFECTO) int pagina,
+            @RequestParam(defaultValue = ELEMENTOS_POR_PAGINA) int elementosPorPagina){
 
-        try{
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-            // https://www.bezkoder.com/spring-boot-pagination-filter-jpa-pageable/
+        Pageable paging = PageRequest.of(pagina, elementosPorPagina);
 
-            Pageable paging = PageRequest.of(nPagina, size);
+        PaginaPeliculasMiniaturaDTO paginaPeliculasMiniaturaDTO = peliculaService.busquedaMiniaturaPeliculas(
+                busqueda,
+                auth.isAuthenticated() ? auth.getName() : null,
+                paging);
 
-            //TODO Utilizar un DTO que tenga la lista de miniaturas mas la pagina actual, el total de paginas y el total de peliculas
-
-            Page<Pelicula> pagePeliculas = peliculaService.busquedaPeliculas(busqueda, paging);
-            List<PeliculaMiniaturaDTO> lstPeliculaMiniaturaDTO = peliculaMapper.peliculatopeliculaMiniaturaDTO(pagePeliculas.getContent());
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("peliculas", lstPeliculaMiniaturaDTO);
-            response.put("actualPagina", pagePeliculas.getNumber());
-            response.put("totalPaginas", pagePeliculas.getTotalPages());
-            response.put("totalPeliculas", pagePeliculas.getTotalElements());
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch(Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        return new ResponseEntity<>(paginaPeliculasMiniaturaDTO, HttpStatus.OK);
     }
 
     @GetMapping("/buscarPeliculasAvanzado")
@@ -102,8 +89,8 @@ public class PeliculaRestController {
             @RequestParam(defaultValue = "") String codigoGenero,
             @RequestParam(defaultValue = "0") int anioDesde,
             @RequestParam(defaultValue = "9999") int anioHasta,
-            @RequestParam(defaultValue = PAGINA_POR_DEFECTO) int nPagina,
-            @RequestParam(defaultValue = ELEMENTOS_POR_PAGINA) int size){
+            @RequestParam(defaultValue = PAGINA_POR_DEFECTO) int pagina,
+            @RequestParam(defaultValue = ELEMENTOS_POR_PAGINA) int elementosPorPagina){
 
         // https://www.bezkoder.com/spring-data-sort-multiple-columns/
 
@@ -116,10 +103,29 @@ public class PeliculaRestController {
         log.info("codigoGenero: " + codigoGenero);
         log.info("anioDesde: " + anioDesde);
         log.info("anioHasta: " + anioHasta);
-        log.info("nPagina: " + nPagina);
-
+        log.info("pagina: " + pagina);
 
         return null;
+    }
+
+    @GetMapping("/buscarPeliculasPorTipoEstado")
+    public PaginaPeliculasMiniaturaDTO buscarPeliculasPorTipoEstado(
+            @RequestParam(name = "busqueda", defaultValue = "") String busqueda,
+            @RequestParam(name = "codigoTipoEstado") String codigoTipoEstado,
+            @RequestParam(name = "pagina", defaultValue = PAGINA_POR_DEFECTO) int pagina,
+            @RequestParam(name = "elementosPorPagina", defaultValue = ELEMENTOS_POR_PAGINA) int elementosPorPagina){
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        Pageable paging = PageRequest.of(pagina, elementosPorPagina);
+
+        PaginaPeliculasMiniaturaDTO paginaPeliculasMiniaturaDTO = peliculaService.busquedaMiniaturaPeliculasPorUsuario(
+                busqueda,
+                auth.getName(),
+                codigoTipoEstado,
+                paging);
+
+        return paginaPeliculasMiniaturaDTO;
 
     }
 
@@ -128,7 +134,7 @@ public class PeliculaRestController {
             @RequestBody PeliculaNuevaDTO pelicula){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        log.info("/nuevo " + auth.getName() + " " + auth.getAuthorities() + " " + pelicula.getTitulo());
+        log.info("/nueva " + auth.getName() + " " + auth.getAuthorities() + " " + pelicula.getTitulo());
 
         if(pelicula.getTitulo() == null || pelicula.getTitulo().isBlank())
             return new ResponseEntity<>("Debe introducir un título de película", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -142,7 +148,6 @@ public class PeliculaRestController {
         }
 
         return new ResponseEntity<>("Pelicula añadida con éxito", HttpStatus.OK);
-
     }
 
     @PostMapping(value = "/guardar")

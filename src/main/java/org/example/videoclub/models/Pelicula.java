@@ -3,6 +3,7 @@ package org.example.videoclub.models;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "peliculas")
@@ -36,10 +37,13 @@ public class Pelicula {
     private Date fechaAlta;
 
     @Column(name = "puntuacion_media")
-    private BigDecimal puntuacionMedia;
+    private Integer puntuacionMedia;
 
     @Column(name = "num_votos")
     private Long numVotos;
+
+    @OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Estado> estados;
 
     public Long getId() {
         return id;
@@ -105,11 +109,11 @@ public class Pelicula {
         this.fechaAlta = fechaAlta;
     }
 
-    public BigDecimal getPuntuacionMedia() {
+    public Integer getPuntuacionMedia() {
         return puntuacionMedia;
     }
 
-    public void setPuntuacionMedia(BigDecimal puntuacionMedia) {
+    public void setPuntuacionMedia(Integer puntuacionMedia) {
         this.puntuacionMedia = puntuacionMedia;
     }
 

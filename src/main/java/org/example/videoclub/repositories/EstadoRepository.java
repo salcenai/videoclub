@@ -31,7 +31,7 @@ public interface EstadoRepository extends JpaRepository<Estado, Long> {
         " FROM Estado e" +
         " INNER JOIN e.pelicula p" +
         " WHERE p.id = ?1")
-    Optional<BigDecimal> avgPuntuacionByIdPelicula(Long idPelicula);
+    Optional<Integer> avgPuntuacionByIdPelicula(Long idPelicula);
 
     @Query("SELECT COUNT(e.puntuacion)" +
         " FROM Estado e" +

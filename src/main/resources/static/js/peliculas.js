@@ -1,4 +1,4 @@
-function buscarPeliculas(nPagina = 0){
+function buscarPeliculas(pagina = 0){
 
     var busqueda = $("#txtBusqueda").val();
 
@@ -8,14 +8,16 @@ function buscarPeliculas(nPagina = 0){
         async: true,
         data : {
             busqueda: busqueda,
-            nPagina: nPagina,
+            pagina: pagina,
         },
         contentType: "application/json",
         dataType: "json",
         success : function (data, status) {
             console.log(data);
 
-            impresionPeliculas(data);
+            impresionPeliculas(data.peliculas);
+            impresionEncontradas(data.totalPeliculas);
+            impresionPaginacion(data.paginaActual, data.totalPaginas);
 
         },
         error : function (xhr, status, error) {
@@ -25,7 +27,7 @@ function buscarPeliculas(nPagina = 0){
 
 }
 
-function buscarPeliculasAvanzado(nPagina = 0){
+function buscarPeliculasAvanzado(pagina = 0){
 
     var busqueda = $("#txtBusqueda").val();
     var pais = $("#selPais").val();
@@ -49,7 +51,7 @@ function buscarPeliculasAvanzado(nPagina = 0){
             codigoGenero: genero,
             anioDesde: anioDesde,
             anioHasta: anioHasta,
-            nPagina: nPagina,
+            pagina: pagina,
         },
         contentType: "application/json",
         dataType: "json",
@@ -121,47 +123,125 @@ function nuevaPelicula(){
 
 }
 
-function impresionPeliculas(data){
+function buscarPeliculasVistas(pagina = 0){
 
-    if(data.totalPeliculas == 0){
-        $('#idPeliculasEncontradas').html("<span>No se han encontrado peliculas</span>");
-    } else {
-        $('#idPeliculasEncontradas').html("<span>Se han encontrado " + data.totalPeliculas + " peliculas</span>");
-    }
+    var busqueda = $("#txtBusqueda").val();
+    var codigoTipoEstado = "VISTA";
+
+    $.ajax({
+        url : "/pelicula/buscarPeliculasPorTipoEstado",
+        type : "GET",
+        async: true,
+        data : {
+            busqueda: busqueda,
+            codigoTipoEstado: codigoTipoEstado,
+            pagina: pagina,
+        },
+        contentType: "application/json",
+        dataType: "json",
+        success : function (data, status) {
+            console.log(data);
+
+            impresionPeliculas(data.peliculas, $("#idPeliculasVistas"));
+//            impresionEncontradas(data.totalPeliculas, $("#idPeliculasVistasEncontradas"));
+            impresionPaginacion(data.paginaActual, data.totalPaginas, $("#idPeliculasVistasPaginacion"));
+
+        },
+        error : function (xhr, status, error) {
+            console.log(status);
+        }
+    });
+}
+
+function buscarPeliculasPendientes(pagina = 0){
+
+    var busqueda = $("#txtBusqueda").val();
+    var codigoTipoEstado = "PENDIENTE";
+
+    $.ajax({
+        url : "/pelicula/buscarPeliculasPorTipoEstado",
+        type : "GET",
+        async: true,
+        data : {
+            busqueda: busqueda,
+            codigoTipoEstado: codigoTipoEstado,
+            pagina: pagina,
+        },
+        contentType: "application/json",
+        dataType: "json",
+        success : function (data, status) {
+            console.log(data);
+
+            impresionPeliculas(data.peliculas, $("#idPeliculasPendientes"));
+//            impresionEncontradas(data.totalPeliculas, $("#idPeliculasPendientesEncontradas"));
+            impresionPaginacion(data.paginaActual, data.totalPaginas, $("#idPeliculasPendientesPaginacion"));
+
+        },
+        error : function (xhr, status, error) {
+            console.log(status);
+        }
+    });
+
+}
+
+function impresionPeliculas(data, contenedorPeliculas = $("#idPeliculas")){
 
     var peliculas = "";
 
-    $.each(data.peliculas, function(i, obj) {
-
+    $.each(data, function(i, obj) {
         peliculas = peliculas + "<div class='col-md-2 p-1'>";
-
+        peliculas = peliculas + "<a href='/pelicula/" + obj.id + "'>";
         peliculas = peliculas + "<img class='card-img' src='images/portada/portada_" + obj.tituloCompacto + ".jpg' alt='" + obj.titulo + "'>";
+        peliculas = peliculas + "<div class='card-img-overlay m-0 p-1 pt-4 text-white'>";
 
-        peliculas = peliculas + "<div class='card-img-overlay m-0 p-1 pt-4'>";
-        peliculas = peliculas + "<div class='text-white p-2' style='background-color: rgba(20, 23, 25, 0.75);'>";
-        peliculas = peliculas + "<a href='/pelicula/" + obj.id + "'><h6>" + obj.titulo + "</h6></a>";
-        peliculas = peliculas + "<h7>" + obj.anio + "</h7>";
-        peliculas = peliculas + "</div>";
+        peliculas = peliculas + "<div class='p-1 m-0' style='background-color: rgba(20, 23, 25, 0.75);'>";
+        peliculas = peliculas + "<span>" + obj.titulo + "</span>";
         peliculas = peliculas + "</div>";
 
+        peliculas = peliculas + "<div class='row p-1 m-0 justify-content-around' style='background-color: rgba(20, 23, 25, 0.75);'>";
+        peliculas = peliculas + "<div><small>" + obj.anio + "</small></div>";
+        if(obj.puntuacionMedia != null){
+            peliculas = peliculas + "<div>";
+            if(obj.puntuacionMedia >= 70){
+                peliculas = peliculas + "<small class='px-1 rounded bg-success'>" + obj.puntuacionMedia + "</small>";
+            } else if(obj.puntuacionMedia >= 50){
+                peliculas = peliculas + "<small class='px-1 rounded bg-warning'>" + obj.puntuacionMedia + "</small>";
+            } else{
+                peliculas = peliculas + "<small class='px-1 rounded bg-danger'>" + obj.puntuacionMedia + "</small>";
+            }
+            if(obj.puntuacionPersonal != null){
+                peliculas = peliculas + "&nbsp;<small class='px-1 rounded bg-primary'>" + obj.puntuacionPersonal + "</small>";
+            }
+            peliculas = peliculas + "</div>";
+        }
         peliculas = peliculas + "</div>";
 
+        peliculas = peliculas + "</div>";
+        peliculas = peliculas + "</a>";
+        peliculas = peliculas + "</div>";
     });
 
-    $('#idPeliculas').html(peliculas);
+    contenedorPeliculas.html(peliculas);
+}
 
-    var paginas = "";
+function impresionEncontradas(totalPeliculas, contenedorEncontradas = $("#idPeliculasEncontradas")){
 
-    for(var i = 0; i < data.totalPaginas; i++){
-
-        if(i == data.actualPagina){
-            paginas = paginas + "<li class='page-item active' onclick='buscarPeliculas(" + i + ")'><a class='page-link' href='#'>" + (i + 1) + "</a></li>";
-        } else {
-            paginas = paginas + "<li class='page-item' onclick='buscarPeliculas(" + i + ")'><a class='page-link' href='#'>" + (i + 1) + "</a></li>";
-        }
-
+    if(totalPeliculas == 0){
+        contenedorEncontradas.html("<span>No se han encontrado peliculas</span>");
+    } else {
+        contenedorEncontradas.html("<span>Se han encontrado " + totalPeliculas + " peliculas</span>");
     }
+}
 
-    $('#idPeliculasPaginacion').html(paginas);
+function impresionPaginacion(paginaActual, totalPaginas, contenedorPaginacion = $("#idPeliculasPaginacion")){
 
+    var paginacion = "";
+    for(var i = 0; i < totalPaginas; i++){
+        if(i == paginaActual){
+            paginacion = paginacion + "<li class='page-item active' onclick='buscarPeliculas(" + i + ")'><a class='page-link' href='#'>" + (i + 1) + "</a></li>";
+        } else {
+            paginacion = paginacion + "<li class='page-item' onclick='buscarPeliculas(" + i + ")'><a class='page-link' href='#'>" + (i + 1) + "</a></li>";
+        }
+    }
+    contenedorPaginacion.html(paginacion);
 }

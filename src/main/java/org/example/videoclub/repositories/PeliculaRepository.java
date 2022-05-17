@@ -17,4 +17,20 @@ public interface PeliculaRepository extends JpaRepository<Pelicula, Long> {
         " WHERE p.titulo LIKE %?1%")
     Page<Pelicula> findByTituloContaining(String titulo, Pageable pagina);
 
+    @Query("SELECT p" +
+        " FROM Pelicula p" +
+        " INNER JOIN p.estados e" +
+        " INNER JOIN e.tipoEstado te" +
+        " INNER JOIN e.usuario u" +
+        " WHERE p.titulo LIKE %?1%" +
+        " AND u.nombre = ?2" +
+        " AND te.codigo = ?3" +
+        " ORDER BY e.fecha DESC")
+    Page<Pelicula> findByTituloContainingAndNombreUsuarioAndCodigoTipoEstadoOrderByFechaEstadoDesc(
+        String titulo,
+        String nombreUsuario,
+        String codigoTipoEstado,
+        Pageable pagina);
+
+
 }

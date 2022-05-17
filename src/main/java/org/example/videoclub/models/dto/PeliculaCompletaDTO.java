@@ -14,7 +14,7 @@ public class PeliculaCompletaDTO {
     private Integer anio;
     private Integer duracion;
     private String sinopsis;
-    private BigDecimal puntuacionMedia;
+    private Integer puntuacionMedia;
     private Long numVotos;
 
     private Map<String, String> mapGeneros;
@@ -89,11 +89,11 @@ public class PeliculaCompletaDTO {
         this.sinopsis = sinopsis;
     }
 
-    public BigDecimal getPuntuacionMedia() {
+    public Integer getPuntuacionMedia() {
         return puntuacionMedia;
     }
 
-    public void setPuntuacionMedia(BigDecimal puntuacionMedia) {
+    public void setPuntuacionMedia(Integer puntuacionMedia) {
         this.puntuacionMedia = puntuacionMedia;
     }
 
