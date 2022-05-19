@@ -15,7 +15,7 @@ public class Pelicula {
     private Long id;
 
     @JoinColumn(name = "id_pais", nullable = true)
-    @ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Pais pais;
 
     @Column(name = "titulo_compacto", nullable = false, unique = true)
