@@ -138,11 +138,11 @@
                 <div class="row p-1">
                     <span class="text-muted">Géneros:&nbsp;</span>
                     <span th:each="genero,iterStat : ${pelicula.mapGeneros}">
-                        <a th:href="'/pelicula/' + ${genero.key}">[[${genero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                        <a th:href="'/genero/' + ${genero.key}">[[${genero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
                     </span>
                     <span class="text-muted">Subgéneros:&nbsp;</span>
                     <span th:each="subgenero,iterStat : ${pelicula.mapSubgeneros}">
-                        <a th:href="'/pelicula/' + ${subgenero.key}">[[${subgenero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                        <a th:href="'/genero/' + ${subgenero.key}">[[${subgenero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
                     </span>
                 </div>
 

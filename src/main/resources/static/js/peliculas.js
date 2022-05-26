@@ -17,7 +17,7 @@ function buscarPeliculas(pagina = 0){
 
             impresionPeliculas(data.peliculas);
             impresionEncontradas(data.totalPeliculas);
-            impresionPaginacion(data.paginaActual, data.totalPaginas);
+            impresionPaginacion(data.paginaActual, data.totalPaginas, "buscarPeliculas");
 
         },
         error : function (xhr, status, error) {
@@ -144,7 +144,7 @@ function buscarPeliculasVistas(pagina = 0){
 
             impresionPeliculas(data.peliculas, $("#idPeliculasVistas"));
 //            impresionEncontradas(data.totalPeliculas, $("#idPeliculasVistasEncontradas"));
-            impresionPaginacion(data.paginaActual, data.totalPaginas, $("#idPeliculasVistasPaginacion"));
+            impresionPaginacion(data.paginaActual, data.totalPaginas, "buscarPeliculasVistas", $("#idPeliculasVistasPaginacion"));
 
         },
         error : function (xhr, status, error) {
@@ -174,7 +174,37 @@ function buscarPeliculasPendientes(pagina = 0){
 
             impresionPeliculas(data.peliculas, $("#idPeliculasPendientes"));
 //            impresionEncontradas(data.totalPeliculas, $("#idPeliculasPendientesEncontradas"));
-            impresionPaginacion(data.paginaActual, data.totalPaginas, $("#idPeliculasPendientesPaginacion"));
+            impresionPaginacion(data.paginaActual, data.totalPaginas, "buscarPeliculasPendientes", $("#idPeliculasPendientesPaginacion"));
+
+        },
+        error : function (xhr, status, error) {
+            console.log(status);
+        }
+    });
+
+}
+
+function buscarPeliculasPorGenero(pagina = 0){
+
+    var busqueda = $("#txtBusqueda").val();
+
+    $.ajax({
+        url : "/genero/buscarPeliculasPorGenero",
+        type : "GET",
+        async: true,
+        data : {
+            busqueda: busqueda,
+            codigoGenero: codigoGenero,
+            pagina: pagina,
+        },
+        contentType: "application/json",
+        dataType: "json",
+        success : function (data, status) {
+            console.log(data);
+
+            impresionPeliculas(data.peliculas);
+            impresionEncontradas(data.totalPeliculas);
+            impresionPaginacion(data.paginaActual, data.totalPaginas, "buscarPeliculasPorGenero");
 
         },
         error : function (xhr, status, error) {
@@ -191,7 +221,7 @@ function impresionPeliculas(data, contenedorPeliculas = $("#idPeliculas")){
     $.each(data, function(i, obj) {
         peliculas = peliculas + "<div class='col-md-2 p-1'>";
         peliculas = peliculas + "<a href='/pelicula/" + obj.id + "'>";
-        peliculas = peliculas + "<img class='card-img' src='images/portada/portada_" + obj.tituloCompacto + ".jpg' alt='" + obj.titulo + "'>";
+        peliculas = peliculas + "<img class='card-img' src='/images/portada/portada_" + obj.tituloCompacto + ".jpg' alt='" + obj.titulo + "'>";
         peliculas = peliculas + "<div class='card-img-overlay m-0 p-1 pt-4 text-white'>";
 
         peliculas = peliculas + "<div class='p-1 m-0' style='background-color: rgba(20, 23, 25, 0.75);'>";
@@ -233,14 +263,14 @@ function impresionEncontradas(totalPeliculas, contenedorEncontradas = $("#idPeli
     }
 }
 
-function impresionPaginacion(paginaActual, totalPaginas, contenedorPaginacion = $("#idPeliculasPaginacion")){
+function impresionPaginacion(paginaActual, totalPaginas, funcion, contenedorPaginacion = $("#idPeliculasPaginacion")){
 
     var paginacion = "";
     for(var i = 0; i < totalPaginas; i++){
         if(i == paginaActual){
-            paginacion = paginacion + "<li class='page-item active' onclick='buscarPeliculas(" + i + ")'><a class='page-link' href='#'>" + (i + 1) + "</a></li>";
+            paginacion = paginacion + "<li class='page-item active' onclick='" + funcion + "(" + i + ")'><a class='page-link' href='#'>" + (i + 1) + "</a></li>";
         } else {
-            paginacion = paginacion + "<li class='page-item' onclick='buscarPeliculas(" + i + ")'><a class='page-link' href='#'>" + (i + 1) + "</a></li>";
+            paginacion = paginacion + "<li class='page-item' onclick='" + funcion + "(" + i + ")'><a class='page-link' href='#'>" + (i + 1) + "</a></li>";
         }
     }
     contenedorPaginacion.html(paginacion);

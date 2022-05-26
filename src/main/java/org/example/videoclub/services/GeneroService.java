@@ -1,5 +1,6 @@
 package org.example.videoclub.services;
 
+import org.example.videoclub.errors.GeneroNoEncontradoException;
 import org.example.videoclub.models.Genero;
 import org.example.videoclub.repositories.GeneroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,23 @@ public class GeneroService {
     @Autowired
     GeneroRepository generoRepository;
 
+
+    public Genero obtenerGeneroByCodigo(String codigoGenero) throws GeneroNoEncontradoException {
+
+        Optional<Genero> genero = generoRepository.findByCodigo(codigoGenero);
+
+        if(!genero.isPresent()){
+            throw new GeneroNoEncontradoException("No se ha encontrado el género con código: " + codigoGenero);
+        }
+
+        return genero.get();
+    }
+
     public Genero obtenerGenero(Long id){
 
         Optional<Genero> p = generoRepository.findById(id);
 
         return p.isPresent() ? p.get() : null;
-
     }
 
     public List<Genero> obtenerGeneros(){

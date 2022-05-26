@@ -45,6 +45,9 @@ public class Pelicula {
     @OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Estado> estados;
 
+    @OneToMany(mappedBy = "pelicula", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<GeneroPelicula> generoPeliculas;
+
     public Long getId() {
         return id;
     }

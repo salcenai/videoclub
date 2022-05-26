@@ -8,6 +8,6 @@
     <hr>
 
     <div th:each="genero : ${T(org.example.videoclub.models.assist.EGenero).values()}">
-        <a th:href="${genero.codigo}" th:text="${genero.nombre}"></a>
+        <a th:href="'/genero/' + ${genero.codigo}" th:text="${genero.nombre}"></a>
     </div>
 </div>

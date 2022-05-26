@@ -79,16 +79,31 @@ public class PeliculaService {
         return peliculaMapper.pagePeliculasToPaginaPeliculasMiniaturaDTO(pagePeliculas, nombreUsuario);
     }
 
-    public PaginaPeliculasMiniaturaDTO busquedaMiniaturaPeliculasPorUsuario(
+    public PaginaPeliculasMiniaturaDTO busquedaMiniaturaPeliculasPorGenero(
+            String codigoGenero,
             String busqueda,
             String nombreUsuario,
-            String codigoTipoEstado,
             Pageable paging){
 
-        Page<Pelicula> pagePeliculas = peliculaRepository.findByTituloContainingAndNombreUsuarioAndCodigoTipoEstadoOrderByFechaEstadoDesc(
+        Page<Pelicula> pagePeliculas = peliculaRepository.findByCodigoGeneroAndTituloContaining(
+                codigoGenero,
+                busqueda,
+                paging);
+
+        return peliculaMapper.pagePeliculasToPaginaPeliculasMiniaturaDTO(pagePeliculas, nombreUsuario);
+
+    }
+
+    public PaginaPeliculasMiniaturaDTO busquedaMiniaturaPeliculasPorCodigoTipoEstado(
+            String codigoTipoEstado,
+            String busqueda,
+            String nombreUsuario,
+            Pageable paging){
+
+        Page<Pelicula> pagePeliculas = peliculaRepository.findByCodigoTipoEstadoAndTituloContainingAndNombreUsuarioOrderByFechaEstadoDesc(
+                codigoTipoEstado,
                 busqueda,
                 nombreUsuario,
-                codigoTipoEstado,
                 paging);
 
         return peliculaMapper.pagePeliculasToPaginaPeliculasMiniaturaDTO(pagePeliculas, nombreUsuario);

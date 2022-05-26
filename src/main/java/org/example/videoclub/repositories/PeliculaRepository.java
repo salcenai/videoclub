@@ -19,18 +19,29 @@ public interface PeliculaRepository extends JpaRepository<Pelicula, Long> {
 
     @Query("SELECT p" +
         " FROM Pelicula p" +
+        " INNER JOIN p.generoPeliculas gp" +
+        " INNER JOIN gp.genero g" +
+        " WHERE p.titulo LIKE %?2%" +
+        " AND g.codigo = ?1")
+    Page<Pelicula> findByCodigoGeneroAndTituloContaining(
+            String codigoGenero,
+            String busqueda,
+            Pageable pagina);
+
+    @Query("SELECT p" +
+        " FROM Pelicula p" +
         " INNER JOIN p.estados e" +
         " INNER JOIN e.tipoEstado te" +
         " INNER JOIN e.usuario u" +
-        " WHERE p.titulo LIKE %?1%" +
-        " AND u.nombre = ?2" +
-        " AND te.codigo = ?3" +
+        " WHERE p.titulo LIKE %?2%" +
+        " AND u.nombre = ?3" +
+        " AND te.codigo = ?1" +
         " ORDER BY e.fecha DESC")
-    Page<Pelicula> findByTituloContainingAndNombreUsuarioAndCodigoTipoEstadoOrderByFechaEstadoDesc(
-        String titulo,
-        String nombreUsuario,
-        String codigoTipoEstado,
-        Pageable pagina);
+    Page<Pelicula> findByCodigoTipoEstadoAndTituloContainingAndNombreUsuarioOrderByFechaEstadoDesc(
+            String codigoTipoEstado,
+            String titulo,
+            String nombreUsuario,
+            Pageable pagina);
 
 
 }

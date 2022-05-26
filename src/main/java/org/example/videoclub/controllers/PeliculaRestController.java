@@ -37,8 +37,8 @@ public class PeliculaRestController {
     @Autowired
     PeliculaMapper peliculaMapper;
 
-    private final String PAGINA_POR_DEFECTO = "0";
-    private final String ELEMENTOS_POR_PAGINA = "12";
+    public static final String PAGINA_POR_DEFECTO = "0";
+    public static final String ELEMENTOS_POR_PAGINA = "12";
 
     @GetMapping("{id}")
     public ModelAndView obtener(
@@ -49,16 +49,11 @@ public class PeliculaRestController {
         ModelAndView mav = new ModelAndView();
 
         try {
-
             PeliculaCompletaDTO pCDTO = peliculaService.obtenerPeliculaCompleta(id, auth.getName());
             mav.addObject("pelicula", pCDTO);
             mav.setViewName("pelicula");
-
         } catch (PeliculaNoEncontradaException e) {
-
             mav.setViewName("recursoNoEncontrado");
-
-            return mav;
         }
 
         return mav;
@@ -119,14 +114,13 @@ public class PeliculaRestController {
 
         Pageable paging = PageRequest.of(pagina, elementosPorPagina);
 
-        PaginaPeliculasMiniaturaDTO paginaPeliculasMiniaturaDTO = peliculaService.busquedaMiniaturaPeliculasPorUsuario(
+        PaginaPeliculasMiniaturaDTO paginaPeliculasMiniaturaDTO = peliculaService.busquedaMiniaturaPeliculasPorCodigoTipoEstado(
+                codigoTipoEstado,
                 busqueda,
                 auth.getName(),
-                codigoTipoEstado,
                 paging);
 
         return paginaPeliculasMiniaturaDTO;
-
     }
 
     @PostMapping(value = "/nueva")
