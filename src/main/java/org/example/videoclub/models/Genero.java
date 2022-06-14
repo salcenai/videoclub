@@ -16,7 +16,7 @@ public class Genero {
     @Column(unique = false, nullable = false)
     private Integer prioridad;
 
-    @Column(unique = true, nullable = false, length = 5)
+    @Column(unique = true, nullable = false, length = 45)
     private String codigo;
 
     @Column(unique = true, nullable = false, length = 45)

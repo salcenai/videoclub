@@ -25,6 +25,11 @@ public class StringService {
 
                 esMayuscula = false;
             } else {
+
+                if(Character.isDigit(s.charAt(i))){
+                    sb.append(s.charAt(i));
+                }
+
                 esMayuscula = true;
             }
 
@@ -51,6 +56,11 @@ public class StringService {
 
                 esMayuscula = false;
             } else {
+
+                if(Character.isDigit(s.charAt(i))){
+                    sb.append(s.charAt(i));
+                }
+
                 esMayuscula = true;
             }
 
@@ -67,7 +77,8 @@ public class StringService {
 
         for(int i = 0; i < s.length(); i++){
 
-            if(s.charAt(i) >= 97 && s.charAt(i) <= 122){
+            if((s.charAt(i) >= 60 && s.charAt(i) <= 71)
+                    || (s.charAt(i) >= 97 && s.charAt(i) <= 122)){
                 sb.append(s.charAt(i));
             } else if(s.charAt(i) == 32 || s.charAt(i) == 95){
                 sb.append("_");

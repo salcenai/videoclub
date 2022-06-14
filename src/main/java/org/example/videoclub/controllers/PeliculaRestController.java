@@ -38,7 +38,7 @@ public class PeliculaRestController {
     PeliculaMapper peliculaMapper;
 
     public static final String PAGINA_POR_DEFECTO = "0";
-    public static final String ELEMENTOS_POR_PAGINA = "12";
+    public static final String ELEMENTOS_POR_PAGINA = "18";
 
     @GetMapping("{id}")
     public ModelAndView obtener(

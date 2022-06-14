@@ -2,6 +2,7 @@ package org.example.videoclub.services;
 
 import org.example.videoclub.errors.GeneroNoEncontradoException;
 import org.example.videoclub.models.Genero;
+import org.example.videoclub.models.mapper.GeneroMapper;
 import org.example.videoclub.repositories.GeneroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,12 @@ public class GeneroService {
         }
 
         return genero.get();
+    }
+
+    public List<String> busquedaGeneros(
+            String busqueda){
+
+        return generoRepository.findNombreByNombreContainingOrderByNombreAsc(busqueda);
     }
 
     public Genero obtenerGenero(Long id){

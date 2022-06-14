@@ -140,10 +140,6 @@
                     <span th:each="genero,iterStat : ${pelicula.mapGeneros}">
                         <a th:href="'/genero/' + ${genero.key}">[[${genero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
                     </span>
-                    <span class="text-muted">Subgéneros:&nbsp;</span>
-                    <span th:each="subgenero,iterStat : ${pelicula.mapSubgeneros}">
-                        <a th:href="'/genero/' + ${subgenero.key}">[[${subgenero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
-                    </span>
                 </div>
 
                 <div class="row p-1">

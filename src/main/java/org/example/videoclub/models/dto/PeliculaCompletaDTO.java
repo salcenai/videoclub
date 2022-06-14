@@ -19,8 +19,6 @@ public class PeliculaCompletaDTO {
 
     private Map<String, String> mapGeneros;
 
-    private Map<String, String> mapSubgeneros;
-
     private CriticaDTO criticaPersonal;
 
     private List<CriticaDTO> lstCriticas;
@@ -113,14 +111,6 @@ public class PeliculaCompletaDTO {
         this.mapGeneros = mapGeneros;
     }
 
-    public Map<String, String> getMapSubgeneros() {
-        return mapSubgeneros;
-    }
-
-    public void setMapSubgeneros(Map<String, String> mapSubgeneros) {
-        this.mapSubgeneros = mapSubgeneros;
-    }
-
     public CriticaDTO getCriticaPersonal() {
         return criticaPersonal;
     }
@@ -151,7 +141,6 @@ public class PeliculaCompletaDTO {
                 ", puntuacionMedia=" + puntuacionMedia +
                 ", numVotos=" + numVotos +
                 ", mapGeneros=" + mapGeneros +
-                ", mapSubgeneros=" + mapSubgeneros +
                 ", criticaPersonal=" + criticaPersonal +
                 ", lstCriticas=" + lstCriticas +
                 '}';

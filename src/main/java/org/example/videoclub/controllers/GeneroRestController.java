@@ -55,6 +55,15 @@ public class GeneroRestController {
         return mav;
     }
 
+    @GetMapping("/buscarGeneros")
+    public ResponseEntity<List<String>> buscarGeneros(
+            @RequestParam(defaultValue = "") String busqueda){
+
+        List<String> lstGeneros = generoService.busquedaGeneros(busqueda);
+
+        return new ResponseEntity<>(lstGeneros, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/buscarPeliculasPorGenero")
     public PaginaPeliculasMiniaturaDTO buscarPeliculasPorGenero(
             @RequestParam(name = "busqueda", defaultValue = "") String busqueda,

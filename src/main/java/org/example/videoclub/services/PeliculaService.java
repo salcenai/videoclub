@@ -22,7 +22,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Column;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +51,9 @@ public class PeliculaService {
 
     @Autowired
     EstadoMapper estadoMapper;
+
+    @Autowired
+    StringService stringService;
 
     public PeliculaCompletaDTO obtenerPeliculaCompleta(Long idPelicula, String nombreUsuario) throws PeliculaNoEncontradaException {
 
@@ -121,45 +126,41 @@ public class PeliculaService {
             throw new PeliculaExistenteException("La pelicula " + pNDTO.getTituloCompacto() + " ya existe");
         }
 
+        List<Genero> lstGeneros = new ArrayList<>();
+        for(String nombreGenero: pNDTO.getLstGeneros()){
+
+            Optional<Genero> generoOpt = generoRepository.findByNombre(nombreGenero);
+
+            Genero genero;
+            if(generoOpt.isPresent()){
+                genero = generoOpt.get();
+            } else {
+                Genero generoNuevo = new Genero();
+                generoNuevo.setPrioridad(2);
+                generoNuevo.setCodigo(stringService.toPascalCase(stringService.eliminarDiacriticos(nombreGenero)));
+                generoNuevo.setNombre(nombreGenero);
+
+                genero = generoRepository.saveAndFlush(generoNuevo);
+            }
+
+            lstGeneros.add(genero);
+        }
+
         Pelicula pelicula = peliculaMapper.peliculaNuevaDTOtoPelicula(pNDTO);
 
         pelicula.setFechaAlta(new Date());
 
         Pelicula peliculaNueva = peliculaRepository.saveAndFlush(pelicula);
 
-        for(int i = 0; i < pNDTO.getLstCodigosGeneros().size(); i++){
+        for(int i = 0; i < lstGeneros.size(); i++){
 
-            Optional<Genero> genero = generoRepository.findByCodigo(pNDTO.getLstCodigosGeneros().get(i));
+            GeneroPelicula gp = new GeneroPelicula();
 
-            if(genero.isPresent()){
-                GeneroPelicula gp = new GeneroPelicula();
-                gp.setOrden(i);
-                gp.setPelicula(peliculaNueva);
-                gp.setGenero(genero.get());
+            gp.setOrden(i);
+            gp.setPelicula(peliculaNueva);
+            gp.setGenero(lstGeneros.get(i));
 
-                generoPeliculaRepository.saveAndFlush(gp);
-            } else {
-                log.error("ERROR al procesar el genero de código: " + pNDTO.getLstCodigosGeneros().get(i));
-            }
-
-        }
-
-        for(int i = 0; i < pNDTO.getLstCodigosSubgeneros().size(); i++){
-
-            Optional<Genero> subgenero = generoRepository.findByCodigo(pNDTO.getLstCodigosSubgeneros().get(i));
-
-            if(subgenero.isPresent()){
-                GeneroPelicula gp = new GeneroPelicula();
-                gp.setOrden(i);
-                gp.setPelicula(peliculaNueva);
-                gp.setGenero(subgenero.get());
-
-                generoPeliculaRepository.saveAndFlush(gp);
-
-            } else {
-                log.error("ERROR al procesar el subgenero de código: " + pNDTO.getLstCodigosSubgeneros().get(i));
-            }
-
+            generoPeliculaRepository.saveAndFlush(gp);
         }
 
         return peliculaNueva;

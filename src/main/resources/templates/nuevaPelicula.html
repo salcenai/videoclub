@@ -19,6 +19,7 @@
 
     <script type="text/javascript" src="/js/videoclub.js"></script>
     <script type="text/javascript" src="/js/peliculas.js"></script>
+    <script type="text/javascript" src="/js/generos.js"></script>
 
     <script>
 
@@ -27,7 +28,7 @@
 
             $('#txtTitulo').keyup(function(event){
 
-                var titulo = $('#txtTitulo').val().toLowerCase();
+                var titulo = $.trim($('#txtTitulo').val().toLowerCase());
 
                 titulo = titulo.replaceAll("á", "a");
                 titulo = titulo.replaceAll("é", "e");
@@ -40,23 +41,33 @@
                 $('#txtTituloCompacto').val(titulo);
             });
 
-            $('#selGenerosCandidatos > option').click(function(event){
-                if(this.parentNode.id == 'selGeneros'){
-                    $('#selGenerosCandidatos').append(this);
-                } else {
-                    $('#selGeneros').append(this);
-                }
-            });
+            $('#txtGenero').keyup(function(event){
 
-            $('#selSubgenerosCandidatos > option').click(function(event){
-                if(this.parentNode.id == 'selSubgeneros'){
-                    $('#selSubgenerosCandidatos').append(this);
-                } else {
-                    $('#selSubgeneros').append(this);
-                }
+                buscarGeneros();
             });
 
         });
+
+        function intercambiarGenero(boton){
+
+            if(boton.parentNode.id == 'divGenerosCandidatos'){
+                $('#divGeneros').append(boton);
+            } else {
+                boton.remove();
+            }
+            $('#txtGenero').val("");
+            $('#txtGenero').focus();
+        }
+
+        function nuevoGenero(){
+
+            var nuevoGenero = $.trim($('#txtGenero').val());
+
+            if(nuevoGenero){
+                $('#divGeneros').append(formarBotonGenero(nuevoGenero));
+                $('#txtGenero').val("");
+            }
+        }
 
     </script>
 
@@ -110,23 +121,29 @@
 
         <div class="form-row mb-3">
 
-            <div class="col-md-3">
-                <label for="selGeneros">Géneros:</label>
-                <select id="selGeneros" class="custom-select mb-3" size="5"></select>
+            <div class="col-md-6">
+                <div>
+                    <label>Géneros añadidos:</label>
+                    <div id="divGeneros">
 
-                <select id="selGenerosCandidatos" class="custom-select" size="10">
-                    <option th:each="genero : ${T(org.example.videoclub.models.assist.EGenero).values()}"
-                            th:value="${genero.codigo}" th:text="${genero.nombre}"></option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="selSubgeneros">Subgéneros:</label>
-                <select id="selSubgeneros" class="custom-select mb-3" multiple size="5"></select>
+                    </div>
+                </div>
+                <div>
+                    <label for="txtGenero">Géneros por añadir:</label>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input id="txtGenero" type="text" placeholder="Acción" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <input type="button" class="btn btn-primary" onclick="nuevoGenero()" value="Añadir" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="divGenerosCandidatos">
 
-                <select id="selSubgenerosCandidatos" class="custom-select" size="10">
-                    <option th:each="subgenero : ${T(org.example.videoclub.models.assist.ESubgenero).values()}"
-                            th:value="${subgenero.codigo}" th:text="${subgenero.nombre}"></option>
-                </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-md-6">
                 <label for="txtSinopsis">Sinopsis:</label>

@@ -76,15 +76,10 @@ function nuevaPelicula(){
     var anio = $("#numAnio").val();
     var duracion = $("#numDuracion").val();
     var sinopsis = $("#txtSinopsis").val();
-    var generos = new Array();
-    $('#selGeneros option').each(function(){
-        generos.push($(this).val());
+    var generos = [];
+    $('#divGeneros > button').each(function(){
+        generos.push($(this).text());
     });
-    var subgeneros = new Array();
-    $('#selSubgeneros option').each(function(){
-        subgeneros.push($(this).val());
-    });
-
     var json = JSON.stringify({
             titulo: titulo,
             tituloCompacto: tituloCompacto,
@@ -92,8 +87,7 @@ function nuevaPelicula(){
             anio: anio,
             duracion: duracion,
             sinopsis: sinopsis,
-            lstCodigosGeneros: generos,
-            lstCodigosSubgeneros: subgeneros,
+            lstGeneros: generos,
     });
 
     $.ajax({

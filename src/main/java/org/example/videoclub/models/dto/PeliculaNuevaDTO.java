@@ -10,8 +10,7 @@ public class PeliculaNuevaDTO {
     private Integer anio;
     private Integer duracion;
     private String sinopsis;
-    private List<String> lstCodigosGeneros;
-    private List<String> lstCodigosSubgeneros;
+    private List<String> lstGeneros;
 
     public String getTitulo() {
         return titulo;
@@ -37,12 +36,8 @@ public class PeliculaNuevaDTO {
         return sinopsis;
     }
 
-    public List<String> getLstCodigosGeneros() {
-        return lstCodigosGeneros;
-    }
-
-    public List<String> getLstCodigosSubgeneros() {
-        return lstCodigosSubgeneros;
+    public List<String> getLstGeneros() {
+        return lstGeneros;
     }
 
     @Override
@@ -54,8 +49,7 @@ public class PeliculaNuevaDTO {
                 ", anio=" + anio +
                 ", duracion=" + duracion +
                 ", sinopsis='" + sinopsis + '\'' +
-                ", lstCodigosGeneros=" + lstCodigosGeneros +
-                ", lstCodigosSubgeneros=" + lstCodigosSubgeneros +
+                ", lstGeneros=" + lstGeneros +
                 '}';
     }
 

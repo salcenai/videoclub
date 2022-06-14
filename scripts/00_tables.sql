@@ -155,7 +155,7 @@ DROP TABLE IF EXISTS `videoclub`.`generos` ;
 CREATE TABLE IF NOT EXISTS `videoclub`.`generos` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `prioridad` INT NOT NULL,
-  `codigo` VARCHAR(5) NOT NULL,
+  `codigo` VARCHAR(45) NOT NULL,
   `nombre` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB

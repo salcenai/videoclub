@@ -11,6 +11,8 @@ public interface GeneroRepository extends JpaRepository<Genero, Long> {
 
     Optional<Genero> findByCodigo(String codigo);
 
+    Optional<Genero> findByNombre(String nombre);
+
     @Query("SELECT g" +
         " FROM Genero g" +
         " INNER JOIN g.generosPelicula gp" +
@@ -18,5 +20,13 @@ public interface GeneroRepository extends JpaRepository<Genero, Long> {
         " WHERE p.id = ?1")
     List<Genero> findByIdPelicula(
             Long idPelicula);
+
+    @Query("SELECT g.nombre" +
+            " FROM Genero g" +
+            " WHERE g.nombre LIKE %?1%" +
+            " ORDER BY g.nombre ASC")
+    List<String> findNombreByNombreContainingOrderByNombreAsc(
+            String busqueda);
+
 
 }

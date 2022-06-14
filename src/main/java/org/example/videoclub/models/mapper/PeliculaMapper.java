@@ -169,17 +169,10 @@ public class PeliculaMapper {
         List<Genero> lstGeneros = generoRepository.findByIdPelicula(p.getId());
 
         Map<String, String> mapGeneros = new HashMap<>();
-        Map<String, String> mapSubgeneros = new HashMap<>();
-
         for(Genero g: lstGeneros){
-            if(g.getPrioridad() == 1){
-                mapGeneros.put(g.getCodigo(), g.getNombre());
-            } else {
-                mapSubgeneros.put(g.getCodigo(), g.getNombre());
-            }
+            mapGeneros.put(g.getCodigo(), g.getNombre());
         }
         pcDTO.setMapGeneros(mapGeneros);
-        pcDTO.setMapSubgeneros(mapSubgeneros);
 
         List<Estado> lstEstado = estadoRepository.findByIdPeliculaAndCriticaIsNotNull(p.getId());
 
