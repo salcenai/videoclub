@@ -1,8 +1,6 @@
 package org.example.videoclub.models.dto;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 public class PeliculaCompletaDTO {
 
@@ -17,7 +15,14 @@ public class PeliculaCompletaDTO {
     private Integer puntuacionMedia;
     private Long numVotos;
 
-    private Map<String, String> mapGeneros;
+    private List<GeneroDTO> lstGeneros;
+
+    private List<EquipoDTO> lstDireccion;
+    private List<EquipoDTO> lstGuion;
+    private List<EquipoDTO> lstBandaSonora;
+    private List<EquipoDTO> lstFotografia;
+    private List<EquipoDTO> lstProduccion;
+    private List<EquipoDTO> lstReparto;
 
     private CriticaDTO criticaPersonal;
 
@@ -103,12 +108,60 @@ public class PeliculaCompletaDTO {
         this.numVotos = numVotos;
     }
 
-    public Map<String, String> getMapGeneros() {
-        return mapGeneros;
+    public List<GeneroDTO> getLstGeneros() {
+        return lstGeneros;
     }
 
-    public void setMapGeneros(Map<String, String> mapGeneros) {
-        this.mapGeneros = mapGeneros;
+    public void setLstGeneros(List<GeneroDTO> lstGeneros) {
+        this.lstGeneros = lstGeneros;
+    }
+
+    public List<EquipoDTO> getLstDireccion() {
+        return lstDireccion;
+    }
+
+    public void setLstDireccion(List<EquipoDTO> lstDireccion) {
+        this.lstDireccion = lstDireccion;
+    }
+
+    public List<EquipoDTO> getLstGuion() {
+        return lstGuion;
+    }
+
+    public void setLstGuion(List<EquipoDTO> lstGuion) {
+        this.lstGuion = lstGuion;
+    }
+
+    public List<EquipoDTO> getLstBandaSonora() {
+        return lstBandaSonora;
+    }
+
+    public void setLstBandaSonora(List<EquipoDTO> lstBandaSonora) {
+        this.lstBandaSonora = lstBandaSonora;
+    }
+
+    public List<EquipoDTO> getLstFotografia() {
+        return lstFotografia;
+    }
+
+    public void setLstFotografia(List<EquipoDTO> lstFotografia) {
+        this.lstFotografia = lstFotografia;
+    }
+
+    public List<EquipoDTO> getLstProduccion() {
+        return lstProduccion;
+    }
+
+    public void setLstProduccion(List<EquipoDTO> lstProduccion) {
+        this.lstProduccion = lstProduccion;
+    }
+
+    public List<EquipoDTO> getLstReparto() {
+        return lstReparto;
+    }
+
+    public void setLstReparto(List<EquipoDTO> lstReparto) {
+        this.lstReparto = lstReparto;
     }
 
     public CriticaDTO getCriticaPersonal() {
@@ -140,7 +193,13 @@ public class PeliculaCompletaDTO {
                 ", sinopsis='" + sinopsis + '\'' +
                 ", puntuacionMedia=" + puntuacionMedia +
                 ", numVotos=" + numVotos +
-                ", mapGeneros=" + mapGeneros +
+                ", lstGeneros=" + lstGeneros +
+                ", lstDireccion=" + lstDireccion +
+                ", lstGuion=" + lstGuion +
+                ", lstBandaSonora=" + lstBandaSonora +
+                ", lstFotografia=" + lstFotografia +
+                ", lstProduccion=" + lstProduccion +
+                ", lstReparto=" + lstReparto +
                 ", criticaPersonal=" + criticaPersonal +
                 ", lstCriticas=" + lstCriticas +
                 '}';

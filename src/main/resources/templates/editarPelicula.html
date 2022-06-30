@@ -14,7 +14,7 @@
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <!--    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
     <script type="text/javascript" src="/js/videoclub.js"></script>
@@ -24,25 +24,10 @@
 
     <script>
 
-        var idPelicula = null;
+        var idPelicula = [[${pelicula.id}]];
 
         $( document ).ready(function() {
             console.log("ready!");
-
-            $('#txtTitulo').keyup(function(event){
-
-                var titulo = $.trim($('#txtTitulo').val().toLowerCase());
-
-                titulo = titulo.replaceAll("á", "a");
-                titulo = titulo.replaceAll("é", "e");
-                titulo = titulo.replaceAll("í", "i");
-                titulo = titulo.replaceAll("ó", "o");
-                titulo = titulo.replaceAll("ú", "u");
-                titulo = titulo.replaceAll(/[^a-zA-Z ]/g, "");
-                titulo = titulo.replaceAll(" ", "_");
-
-                $('#txtTituloCompacto').val(titulo);
-            });
 
             $('#txtGenero').keyup(function(event){
 
@@ -159,7 +144,7 @@
 
     <hr>
 
-    <form id="formNuevaPelicula">
+    <form id="formEditarPelicula">
 
         <div class="form-row justify-content-center">
             <span id="lblMensaje" class="text-danger"></span>
@@ -168,13 +153,13 @@
         <div class="form-row mb-3">
             <div class="col-md-6">
                 <label for="txtTitulo">Título:</label>
-                <input type="text" id="txtTitulo" class="form-control" autofocus="autofocus" />
+                <input type="text" id="txtTitulo" class="form-control" autofocus="autofocus" th:value="${pelicula.titulo}" />
             </div>
 
             <div class="col-md-6">
                 <label for="selPais">País</label>
                 <select id="selPais" class="custom-select">
-                    <option value="" selected>Cualquier país</option>
+                    <option th:value="${pelicula.codigoPais}" selected>Cualquier país</option>
                     <option th:each="pais : ${T(org.example.videoclub.models.assist.EPais).values()}"
                             th:value="${pais.codigo}" th:text="${pais.nombre}"></option>
                 </select>
@@ -184,17 +169,17 @@
         <div class="form-row mb-3">
             <div class="col-md-6">
                 <label for="txtTituloCompacto">Título compacto: (En minúsculas y sin espacios)</label>
-                <input type="text" id="txtTituloCompacto" class="form-control" />
+                <input type="text" id="txtTituloCompacto" class="form-control" th:value="${pelicula.tituloCompacto}" />
             </div>
 
             <div class="col-md-3">
                 <label for="numAnio">Año:</label>
-                <input id="numAnio" type="number" min="1895" max="2030" step="1" value="2022" class="form-control" />
+                <input id="numAnio" type="number" min="1895" max="2030" step="1" th:value="${pelicula.anio}" class="form-control" />
             </div>
 
             <div class="col-md-3">
                 <label for="numDuracion">Duracion: (En minutos)</label>
-                <input id="numDuracion" type="number" min="1" max="500" step="1" value="90" class="form-control" />
+                <input id="numDuracion" type="number" min="1" max="500" step="1" th:value="${pelicula.duracion}" class="form-control" />
             </div>
         </div>
 
@@ -204,7 +189,7 @@
                 <div>
                     <label>Géneros añadidos:</label>
                     <div id="divGeneros">
-
+                        <button type="button" onclick="intercambiar(this)" class="btn btn-outline-primary" th:each="genero: ${pelicula.lstGeneros}">[[${genero}]]</button>
                     </div>
                 </div>
                 <div>
@@ -229,7 +214,7 @@
                 <div>
                     <label>Dirección:</label>
                     <div id="divDireccion">
-
+                        <button type="button" onclick="intercambiar(this)" class="btn btn-outline-primary" th:each="direccion: ${pelicula.lstDireccion}">[[${direccion}]]</button>
                     </div>
                 </div>
                 <div>
@@ -254,7 +239,7 @@
                 <div>
                     <label>Guion:</label>
                     <div id="divGuion">
-
+                        <button type="button" onclick="intercambiar(this)" class="btn btn-outline-primary" th:each="guion: ${pelicula.lstGuion}">[[${guion}]]</button>
                     </div>
                 </div>
                 <div>
@@ -279,7 +264,7 @@
                 <div>
                     <label>Banda sonora:</label>
                     <div id="divBandaSonora">
-
+                        <button type="button" onclick="intercambiar(this)" class="btn btn-outline-primary" th:each="bandaSonora: ${pelicula.lstBandaSonora}">[[${bandaSonora}]]</button>
                     </div>
                 </div>
                 <div>
@@ -304,7 +289,7 @@
                 <div>
                     <label>Fotografía:</label>
                     <div id="divFotografia">
-
+                        <button type="button" onclick="intercambiar(this)" class="btn btn-outline-primary" th:each="fotografia: ${pelicula.lstFotografia}">[[${fotografia}]]</button>
                     </div>
                 </div>
                 <div>
@@ -329,7 +314,7 @@
                 <div>
                     <label>Producción:</label>
                     <div id="divProduccion">
-
+                        <button type="button" onclick="intercambiar(this)" class="btn btn-outline-primary" th:each="produccion: ${pelicula.lstProduccion}">[[${produccion}]]</button>
                     </div>
                 </div>
                 <div>
@@ -354,7 +339,7 @@
                 <div>
                     <label>Reparto:</label>
                     <div id="divReparto">
-
+                        <button type="button" onclick="intercambiar(this)" class="btn btn-outline-primary" th:each="reparto: ${pelicula.lstReparto}">[[${reparto}]]</button>
                     </div>
                 </div>
                 <div>
@@ -377,12 +362,12 @@
 
             <div class="col-md-12">
                 <label for="txtSinopsis">Sinopsis:</label>
-                <textarea id="txtSinopsis" class="form-control" rows="5"/></textarea>
+                <textarea id="txtSinopsis" class="form-control" rows="5" th:value="${pelicula.sinopsis}"/></textarea>
             </div>
         </div>
 
         <div class="form-row mb-3 justify-content-around">
-            <input type="button" onclick="guardarPelicula()" class="btn btn-primary" value="Nueva película" />
+            <input type="button" onclick="guardarPelicula()" class="btn btn-primary" value="Editar película" />
         </div>
 
     </form>

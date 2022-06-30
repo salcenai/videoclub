@@ -68,7 +68,7 @@ function buscarPeliculasAvanzado(pagina = 0){
 
 }
 
-function nuevaPelicula(){
+function guardarPelicula(){
 
     var titulo = $("#txtTitulo").val();
     var tituloCompacto = $("#txtTituloCompacto").val();
@@ -80,7 +80,33 @@ function nuevaPelicula(){
     $('#divGeneros > button').each(function(){
         generos.push($(this).text());
     });
+    var direccion = [];
+    $('#divDireccion > button').each(function(){
+        direccion.push($(this).text());
+    });
+    var guion = [];
+    $('#divGuion > button').each(function(){
+        guion.push($(this).text());
+    });
+    var bandaSonora = [];
+    $('#divBandaSonora > button').each(function(){
+        bandaSonora.push($(this).text());
+    });
+    var fotografia = [];
+    $('#divFotografia > button').each(function(){
+        fotografia.push($(this).text());
+    });
+    var produccion = [];
+    $('#divProduccion > button').each(function(){
+        produccion.push($(this).text());
+    });
+    var reparto = [];
+    $('#divReparto > button').each(function(){
+        reparto.push($(this).text());
+    });
+
     var json = JSON.stringify({
+            id: idPelicula,
             titulo: titulo,
             tituloCompacto: tituloCompacto,
             codigoPais: pais,
@@ -88,10 +114,16 @@ function nuevaPelicula(){
             duracion: duracion,
             sinopsis: sinopsis,
             lstGeneros: generos,
+            lstDireccion: direccion,
+            lstGuion: guion,
+            lstBandaSonora: bandaSonora,
+            lstFotografia: fotografia,
+            lstProduccion: produccion,
+            lstReparto: reparto,
     });
 
     $.ajax({
-        url : "/pelicula/nueva",
+        url : "/pelicula/guardar",
         type : "POST",
         async: true,
         data : json,

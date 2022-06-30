@@ -13,15 +13,15 @@ public class Estado {
     private Long id;
 
     @JoinColumn(name = "id_pelicula", nullable = false)
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Pelicula pelicula;
 
     @JoinColumn(name = "id_usuario", nullable = false)
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Usuario usuario;
 
     @JoinColumn(name = "id_tipo_estado")
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private TipoEstado tipoEstado;
 
     @Column(name = "puntuacion")

@@ -1,14 +1,11 @@
 package org.example.videoclub.services;
 
-import org.example.videoclub.errors.PeliculaExistenteException;
 import org.example.videoclub.errors.PeliculaNoEncontradaException;
-import org.example.videoclub.models.Estado;
-import org.example.videoclub.models.Genero;
-import org.example.videoclub.models.GeneroPelicula;
-import org.example.videoclub.models.Pelicula;
+import org.example.videoclub.models.*;
+import org.example.videoclub.models.assist.ESeccion;
 import org.example.videoclub.models.dto.PaginaPeliculasMiniaturaDTO;
 import org.example.videoclub.models.dto.PeliculaCompletaDTO;
-import org.example.videoclub.models.dto.PeliculaNuevaDTO;
+import org.example.videoclub.models.dto.PeliculaDTO;
 import org.example.videoclub.models.mapper.EstadoMapper;
 import org.example.videoclub.models.mapper.PeliculaMapper;
 import org.example.videoclub.repositories.EstadoRepository;
@@ -22,17 +19,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Column;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PeliculaService {
 
     Logger log = LoggerFactory.getLogger(PeliculaService.class);
+
+    @Autowired
+    GeneroService generoService;
+
+    @Autowired
+    EquipoService equipoService;
+
+    @Autowired
+    GeneroPeliculaService generoPeliculaService;
+
+    @Autowired
+    EquipoPeliculaService equipoPeliculaService;
+
+    @Autowired
+    SeccionService seccionService;
 
     @Autowired
     PeliculaRepository peliculaRepository;
@@ -72,6 +79,19 @@ public class PeliculaService {
         }
 
         return pCDTO;
+    }
+
+    public PeliculaDTO obtenerPeliculaDTO(
+            Long idPelicula) throws PeliculaNoEncontradaException {
+
+
+        Optional<Pelicula> p = peliculaRepository.findById(idPelicula);
+
+        if(!p.isPresent()){
+            throw new PeliculaNoEncontradaException("La pelicula " + idPelicula + " no ha sido encontrada");
+        }
+
+        return peliculaMapper.peliculaToPeliculaDTO(p.get());
     }
 
     public PaginaPeliculasMiniaturaDTO busquedaMiniaturaPeliculas(
@@ -114,56 +134,92 @@ public class PeliculaService {
         return peliculaMapper.pagePeliculasToPaginaPeliculasMiniaturaDTO(pagePeliculas, nombreUsuario);
     }
 
-    public Pelicula guardarPelicula(Pelicula pelicula){
-        return peliculaRepository.saveAndFlush(pelicula);
-    }
+    public Pelicula guardar(
+            PeliculaDTO pDTO) {
 
-    public Pelicula nuevaPelicula(PeliculaNuevaDTO pNDTO) throws PeliculaExistenteException {
-
-        Optional<Pelicula> peliculaExistente = peliculaRepository.findByTituloCompacto(pNDTO.getTituloCompacto());
-
-        if(peliculaExistente.isPresent()){
-            throw new PeliculaExistenteException("La pelicula " + pNDTO.getTituloCompacto() + " ya existe");
+        if(pDTO.getId() != null){
+            generoPeliculaService.eliminarPorIdPelicula(pDTO.getId());
+            equipoPeliculaService.eliminarPorIdPelicula(pDTO.getId());
         }
 
         List<Genero> lstGeneros = new ArrayList<>();
-        for(String nombreGenero: pNDTO.getLstGeneros()){
-
-            Optional<Genero> generoOpt = generoRepository.findByNombre(nombreGenero);
-
+        for(String nombreGenero: pDTO.getLstGeneros()){
+            Optional<Genero> generoOpt = generoService.obtenerPorNombre(nombreGenero);
             Genero genero;
             if(generoOpt.isPresent()){
                 genero = generoOpt.get();
             } else {
-                Genero generoNuevo = new Genero();
-                generoNuevo.setPrioridad(2);
-                generoNuevo.setCodigo(stringService.toPascalCase(stringService.eliminarDiacriticos(nombreGenero)));
-                generoNuevo.setNombre(nombreGenero);
-
-                genero = generoRepository.saveAndFlush(generoNuevo);
+                genero = generoService.guardarNuevo(nombreGenero);
             }
-
             lstGeneros.add(genero);
         }
 
-        Pelicula pelicula = peliculaMapper.peliculaNuevaDTOtoPelicula(pNDTO);
+        Map<ESeccion, List<String>> mapLstNombresEquipo = new HashMap<>();
+        mapLstNombresEquipo.put(ESeccion.Direccion, pDTO.getLstDireccion());
+        mapLstNombresEquipo.put(ESeccion.Guion, pDTO.getLstGuion());
+        mapLstNombresEquipo.put(ESeccion.BandaSonora, pDTO.getLstBandaSonora());
+        mapLstNombresEquipo.put(ESeccion.Fotografia, pDTO.getLstFotografia());
+        mapLstNombresEquipo.put(ESeccion.Produccion, pDTO.getLstProduccion());
+        mapLstNombresEquipo.put(ESeccion.Reparto, pDTO.getLstReparto());
 
+        Map<ESeccion, List<Equipo>> mapLstEquipo = new HashMap<>();
+
+        for (ESeccion eSeccion : mapLstNombresEquipo.keySet()) {
+            List<Equipo> lstEquipo = new ArrayList<>();
+            for(String nombreEquipo : mapLstNombresEquipo.get(eSeccion)){
+                Optional<Equipo> equipoOpt = equipoService.obtenerPorNombre(nombreEquipo);
+                Equipo equipo;
+                if(equipoOpt.isPresent()){
+                    equipo = equipoOpt.get();
+                } else {
+                    equipo = equipoService.guardarNuevo(nombreEquipo);
+                }
+                lstEquipo.add(equipo);
+            }
+            mapLstEquipo.put(eSeccion, lstEquipo);
+        }
+
+        Pelicula pelicula = peliculaMapper.peliculaDTOtoPelicula(pDTO);
         pelicula.setFechaAlta(new Date());
 
-        Pelicula peliculaNueva = peliculaRepository.saveAndFlush(pelicula);
+        pelicula = guardar(pelicula);
 
         for(int i = 0; i < lstGeneros.size(); i++){
-
             GeneroPelicula gp = new GeneroPelicula();
 
             gp.setOrden(i);
-            gp.setPelicula(peliculaNueva);
+            gp.setPelicula(pelicula);
             gp.setGenero(lstGeneros.get(i));
 
-            generoPeliculaRepository.saveAndFlush(gp);
+            generoPeliculaService.guardar(gp);
         }
 
-        return peliculaNueva;
+        for(ESeccion eSeccion : mapLstEquipo.keySet()){
+            if(mapLstEquipo.get(eSeccion).size() > 0){
+                Optional<Seccion> seccionOpt = seccionService.obtenerPorNombre(eSeccion.getNombre());
+
+                for(Equipo equipo : mapLstEquipo.get(eSeccion)){
+
+                    EquipoPelicula ep = new EquipoPelicula();
+
+                    ep.setPelicula(pelicula);
+                    ep.setSeccion(seccionOpt.get());
+                    ep.setEquipo(equipo);
+                    ep.setNotas(null);
+
+                    equipoPeliculaService.guardar(ep);
+
+                }
+            }
+        }
+
+        return pelicula;
+    }
+
+    private Pelicula guardar(
+            Pelicula p){
+
+        return peliculaRepository.saveAndFlush(p);
     }
 
     public Boolean eliminarPelicula(Long id){

@@ -35,8 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/pelicula/{id}", "/pelicula/buscarPeliculas", "/pelicula/buscarPeliculasAvanzado",
                         "/genero/{codigoGenero}", "/genero/buscarPeliculasPorGenero")
                     .permitAll()
-                .antMatchers("/estado/nuevo",
-                        "/pelicula/nueva")
+                .antMatchers("/estado/nuevo")
                     .authenticated()
 //                    .hasAuthority("USER")
                 .anyRequest()

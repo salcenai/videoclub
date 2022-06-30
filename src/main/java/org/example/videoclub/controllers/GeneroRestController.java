@@ -46,7 +46,7 @@ public class GeneroRestController {
 
         try{
             mav.addObject("codigoGenero", codigoGenero);
-            mav.addObject("genero", generoService.obtenerGeneroByCodigo(codigoGenero).getNombre());
+            mav.addObject("genero", generoService.obtenerGeneroPorCodigo(codigoGenero).getNombre());
             mav.setViewName("genero");
         } catch(GeneroNoEncontradoException e){
             mav.setViewName("recursoNoEncontrado");
@@ -59,7 +59,7 @@ public class GeneroRestController {
     public ResponseEntity<List<String>> buscarGeneros(
             @RequestParam(defaultValue = "") String busqueda){
 
-        List<String> lstGeneros = generoService.busquedaGeneros(busqueda);
+        List<String> lstGeneros = generoService.busqueda(busqueda);
 
         return new ResponseEntity<>(lstGeneros, HttpStatus.OK);
     }
@@ -82,21 +82,6 @@ public class GeneroRestController {
                 paging);
 
         return paginaPeliculasMiniaturaDTO;
-    }
-
-    @GetMapping(value = "/obtenerGeneros")
-    public ResponseEntity<List<GeneroDTO>> obtenerGeneros(){
-
-        return new ResponseEntity<>(generoMapper.generotoGeneroDTO(generoService.obtenerGeneros()), HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/guardar")
-    public ResponseEntity<Boolean> guardarGenero(
-            @RequestBody GeneroDTO gDTO){
-
-        generoService.guardarGenero(generoMapper.generoDTOtoGenero(gDTO));
-
-        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/eliminar/{id}")

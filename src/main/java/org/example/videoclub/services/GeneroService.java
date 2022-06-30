@@ -2,7 +2,6 @@ package org.example.videoclub.services;
 
 import org.example.videoclub.errors.GeneroNoEncontradoException;
 import org.example.videoclub.models.Genero;
-import org.example.videoclub.models.mapper.GeneroMapper;
 import org.example.videoclub.repositories.GeneroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,12 @@ public class GeneroService {
     @Autowired
     GeneroRepository generoRepository;
 
+    @Autowired
+    StringService stringService;
 
-    public Genero obtenerGeneroByCodigo(String codigoGenero) throws GeneroNoEncontradoException {
+
+    public Genero obtenerGeneroPorCodigo(
+            String codigoGenero) throws GeneroNoEncontradoException {
 
         Optional<Genero> genero = generoRepository.findByCodigo(codigoGenero);
 
@@ -28,28 +31,48 @@ public class GeneroService {
         return genero.get();
     }
 
-    public List<String> busquedaGeneros(
+    public Optional<Genero> obtener(
+            Long id){
+
+        return generoRepository.findById(id);
+    }
+
+    public Optional<Genero> obtenerPorNombre(
+            String nombreGenero){
+
+        return generoRepository.findByNombre(nombreGenero);
+    }
+
+    public List<Genero> obtener(
+            ){
+        return generoRepository.findAll();
+    }
+
+    public List<String> busqueda(
             String busqueda){
 
         return generoRepository.findNombreByNombreContainingOrderByNombreAsc(busqueda);
     }
 
-    public Genero obtenerGenero(Long id){
+    public Genero guardarNuevo(
+            String nombreGenero){
 
-        Optional<Genero> p = generoRepository.findById(id);
+        Genero generoNuevo = new Genero();
+        generoNuevo.setPrioridad(2);
+        generoNuevo.setCodigo(stringService.toPascalCase(stringService.eliminarDiacriticos(nombreGenero)));
+        generoNuevo.setNombre(nombreGenero);
 
-        return p.isPresent() ? p.get() : null;
+        return guardar(generoNuevo);
     }
 
-    public List<Genero> obtenerGeneros(){
-        return generoRepository.findAll();
+    private Genero guardar(
+            Genero g){
+
+        return generoRepository.saveAndFlush(g);
     }
 
-    public Genero guardarGenero(Genero p){
-        return generoRepository.saveAndFlush(p);
-    }
-
-    public Boolean eliminarGenero(Long id){
+    public Boolean eliminarGenero(
+            Long id){
 
         Optional<Genero> p = generoRepository.findById(id);
 

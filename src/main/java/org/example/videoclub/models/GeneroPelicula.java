@@ -15,11 +15,11 @@ public class GeneroPelicula {
     private Integer orden;
 
     @JoinColumn(name = "id_pelicula", nullable = false)
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Pelicula pelicula;
 
     @JoinColumn(name = "id_genero", nullable = false)
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Genero genero;
 
     public Long getId() {

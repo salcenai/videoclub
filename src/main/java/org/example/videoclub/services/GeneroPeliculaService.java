@@ -1,5 +1,7 @@
 package org.example.videoclub.services;
 
+import org.example.videoclub.models.EquipoPelicula;
+import org.example.videoclub.models.Genero;
 import org.example.videoclub.models.GeneroPelicula;
 import org.example.videoclub.repositories.GeneroPeliculaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +32,24 @@ public class GeneroPeliculaService {
         return generoPeliculaRepository.saveAndFlush(p);
     }
 
-    public Boolean eliminarGeneroPelicula(Long id){
+    public GeneroPelicula guardar(
+            GeneroPelicula gp){
 
-        Optional<GeneroPelicula> p = generoPeliculaRepository.findById(id);
+        return generoPeliculaRepository.saveAndFlush(gp);
+    }
 
-        if(p.isPresent()){
-            generoPeliculaRepository.deleteById(id);
-            return true;
-        } else {
-            return false;
-        }
+    public void eliminarPorIdPelicula(
+            Long idPelicula){
 
+        List<GeneroPelicula> lstGeneroPelicula = generoPeliculaRepository.findByIdPelicula(idPelicula);
+
+        eliminar(lstGeneroPelicula);
+    }
+
+    public void eliminar(
+            List<GeneroPelicula> lstGeneroPelicula){
+
+        generoPeliculaRepository.deleteAll(lstGeneroPelicula);
     }
 
 }

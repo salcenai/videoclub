@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Videoclub</title>
@@ -137,39 +137,55 @@
 
                 <div class="row p-1">
                     <span class="text-muted">Géneros:&nbsp;</span>
-                    <span th:each="genero,iterStat : ${pelicula.mapGeneros}">
-                        <a th:href="'/genero/' + ${genero.key}">[[${genero.value}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    <span th:each="genero,iterStat : ${pelicula.lstGeneros}">
+                        <a th:href="'/genero/' + ${genero.codigo}">[[${genero.nombre}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
                     </span>
-                </div>
-
-                <div class="row p-1">
-                    <span class="text-muted">Sinopsis:&nbsp;</span>
-                    <span>[[${pelicula.sinopsis}]]</span>
                 </div>
 
                 <hr>
 
-                <div>
-                    <div class="row p-1">
-                        <span class="text-muted">Dirección:&nbsp;</span>
-                        <span>BLABLABLA</span>
-                    </div>
-                    <div class="row p-1">
-                        <span class="text-muted">Guión:&nbsp;</span>
-                        <span>TOCOTO</span>
-                    </div>
-                    <div class="row p-1">
-                        <span class="text-muted">Reparto:&nbsp;</span>
-                        <span>TIRURI</span>
-                    </div>
-                    <div class="row p-1">
-                        <span class="text-muted">Productor:&nbsp;</span>
-                        <span>TIRURI</span>
-                    </div>
-                    <div class="row p-1">
-                        <span class="text-muted">Banda sonora:&nbsp;</span>
-                        <span>TIRURI</span>
-                    </div>
+                <div class="row p-1">
+                    <span class="text-muted">Dirección:&nbsp;</span>
+                    <span th:each="direccion,iterStat : ${pelicula.lstDireccion}">
+                        <a th:href="'/equipo/' + ${direccion.codigo}">[[${direccion.nombre}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    </span>
+                </div>
+                <div class="row p-1">
+                    <span class="text-muted">Guion:&nbsp;</span>
+                    <span th:each="guion,iterStat : ${pelicula.lstGuion}">
+                        <a th:href="'/equipo/' + ${guion.codigo}">[[${guion.nombre}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    </span>
+                </div>
+                <div class="row p-1">
+                    <span class="text-muted">Banda sonora:&nbsp;</span>
+                    <span th:each="bandaSonora,iterStat : ${pelicula.lstBandaSonora}">
+                        <a th:href="'/equipo/' + ${bandaSonora.codigo}">[[${bandaSonora.nombre}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    </span>
+                </div>
+                <div class="row p-1">
+                    <span class="text-muted">Fotografía:&nbsp;</span>
+                    <span th:each="fotografia,iterStat : ${pelicula.lstFotografia}">
+                        <a th:href="'/equipo/' + ${fotografia.codigo}">[[${fotografia.nombre}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    </span>
+                </div>
+                <div class="row p-1">
+                    <span class="text-muted">Producción:&nbsp;</span>
+                    <span th:each="produccion,iterStat : ${pelicula.lstProduccion}">
+                        <a th:href="'/equipo/' + ${produccion.codigo}">[[${produccion.nombre}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    </span>
+                </div>
+                <div class="row p-1">
+                    <span class="text-muted">Reparto:&nbsp;</span>
+                    <span th:each="reparto,iterStat : ${pelicula.lstReparto}">
+                        <a th:href="'/equipo/' + ${reparto.codigo}">[[${reparto.nombre}]]</a>[[${!iterStat.last ? ',' : ''}]]&nbsp;
+                    </span>
+                </div>
+
+                <hr>
+
+                <div class="row p-1">
+                    <span class="text-muted">Sinopsis:&nbsp;</span>
+                    <span>[[${pelicula.sinopsis}]]</span>
                 </div>
 
             </div>
@@ -234,6 +250,15 @@
                 </blockquote>
             </div>
         </div>
+
+        <div th:if="${#lists.contains(roles, 'ADMIN')}">
+            <hr>
+
+            <div class="row justify-content-center">
+                <a th:href="'/pelicula/editar/' + ${pelicula.id}" class="btn btn-primary">Editar película</a>
+            </div>
+        </div>
+
     </div>
 </body>
 </html>

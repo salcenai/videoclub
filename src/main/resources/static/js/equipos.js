@@ -1,9 +1,7 @@
-function buscarGeneros(){
-
-    var busqueda = $("#txtGenero").val();
+function buscarEquipo(busqueda, contenedor){
 
     $.ajax({
-        url : "/genero/buscarGeneros",
+        url : "/equipo/buscarEquipo",
         type : "GET",
         async: true,
         data : {
@@ -13,13 +11,13 @@ function buscarGeneros(){
         dataType: "json",
         success : function (data, status) {
 
-            var generos = "";
+            var equipos = "";
 
             $.each(data, function(i, obj) {
-                generos = generos + formarBoton(obj);
+                equipos = equipos + formarBoton(obj);
             });
 
-            $("#divGenerosCandidatos").html(generos);
+            contenedor.html(equipos);
 
         },
         error : function (xhr, status, error) {
@@ -27,9 +25,4 @@ function buscarGeneros(){
         }
     });
 
-}
-
-function formarBoton(nombre){
-
-    return "<button type='button' onclick='intercambiar(this)' class='btn btn-outline-primary'>" + nombre + "</button>";
 }

@@ -16,14 +16,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/pelicula")
@@ -55,6 +55,10 @@ public class PeliculaRestController {
         } catch (PeliculaNoEncontradaException e) {
             mav.setViewName("recursoNoEncontrado");
         }
+
+        List<String> lstRoles = auth.getAuthorities().stream()
+                .map(r -> r.getAuthority()).collect(Collectors.toList());
+        mav.addObject("roles", lstRoles);
 
         return mav;
     }
@@ -123,34 +127,38 @@ public class PeliculaRestController {
         return paginaPeliculasMiniaturaDTO;
     }
 
-    @PostMapping(value = "/nueva")
-    public ResponseEntity<String> nueva(
-            @RequestBody PeliculaNuevaDTO pelicula){
+    @PostMapping(value = "/guardar")
+    public ResponseEntity<String> guardar(
+            @RequestBody PeliculaDTO pelicula){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        log.info("/nueva " + auth.getName() + " " + auth.getAuthorities() + " " + pelicula.getTitulo());
+        log.info("/guardar " + auth.getName() + " " + auth.getAuthorities() + " " + pelicula.getTitulo());
 
         if(pelicula.getTitulo() == null || pelicula.getTitulo().isBlank())
             return new ResponseEntity<>("Debe introducir un título de película", HttpStatus.INTERNAL_SERVER_ERROR);
         if(pelicula.getTituloCompacto() == null || pelicula.getTituloCompacto().isBlank())
             return new ResponseEntity<>("Debe introducir un título compacto de película", HttpStatus.INTERNAL_SERVER_ERROR);
 
-        try {
-            peliculaService.nuevaPelicula(pelicula);
-        } catch (PeliculaExistenteException e) {
-            return new ResponseEntity<>("El nombre compacto ya existe", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        peliculaService.guardar(pelicula);
 
-        return new ResponseEntity<>("Pelicula añadida con éxito", HttpStatus.OK);
+        return new ResponseEntity<>("Pelicula guardada con éxito", HttpStatus.OK);
     }
 
-    @PostMapping(value = "/guardar")
-    public ResponseEntity<Boolean> guardarPelicula(
-            @RequestBody PeliculaDTO pDTO){
+    @GetMapping("/editar/{id}")
+    public ModelAndView editarPelicula(
+            @PathVariable Long id){
 
-        peliculaService.guardarPelicula(peliculaMapper.peliculaDTOtoPelicula(pDTO));
+        ModelAndView mav = new ModelAndView();
 
-        return new ResponseEntity<>(true, HttpStatus.OK);
+        try {
+            PeliculaDTO pDTO = peliculaService.obtenerPeliculaDTO(id);
+            mav.addObject("pelicula", pDTO);
+            mav.setViewName("editarPelicula");
+        } catch (PeliculaNoEncontradaException e) {
+            mav.setViewName("recursoNoEncontrado");
+        }
+
+        return mav;
     }
 
     @DeleteMapping(value = "/eliminar/{id}")

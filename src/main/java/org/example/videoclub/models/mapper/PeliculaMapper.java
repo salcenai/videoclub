@@ -1,18 +1,13 @@
 package org.example.videoclub.models.mapper;
 
-import org.example.videoclub.models.Estado;
-import org.example.videoclub.models.Genero;
-import org.example.videoclub.models.Pais;
-import org.example.videoclub.models.Pelicula;
+import org.example.videoclub.models.*;
+import org.example.videoclub.models.assist.ESeccion;
 import org.example.videoclub.models.dto.*;
-import org.example.videoclub.repositories.EstadoRepository;
-import org.example.videoclub.repositories.GeneroRepository;
-import org.example.videoclub.repositories.PaisRepository;
+import org.example.videoclub.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,72 +24,33 @@ public class PeliculaMapper {
     EstadoRepository estadoRepository;
 
     @Autowired
+    EquipoPeliculaRepository equipoPeliculaRepository;
+
+    @Autowired
     EstadoMapper estadoMapper;
+
+    @Autowired
+    GeneroMapper generoMapper;
+
+    @Autowired
+    EquipoMapper equipoMapper;
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
     public Pelicula peliculaDTOtoPelicula(
-            PeliculaDTO pDTO){
+            PeliculaDTO pDTO) {
 
         Pelicula p = new Pelicula();
         p.setId(pDTO.getId());
-        Pais pais = paisRepository.findByCodigo(pDTO.getCodigoPais());
-        p.setPais(pais);
         p.setTitulo(pDTO.getTitulo());
-        p.setAnio(pDTO.getAnio());
-        p.setDuracion(pDTO.getDuracion());
-
-        return p;
-    }
-
-    public List<Pelicula> peliculaDTOtoPelicula(
-            List<PeliculaDTO> lstPDTO){
-
-        List<Pelicula> lstP = new ArrayList<>();
-        for(PeliculaDTO pDTO : lstPDTO){
-            lstP.add(peliculaDTOtoPelicula(pDTO));
-        }
-
-        return lstP;
-    }
-
-    public PeliculaDTO peliculatoPeliculaDTO(
-            Pelicula pelicula){
-
-        PeliculaDTO pDTO = new PeliculaDTO();
-        pDTO.setId(pelicula.getId());
-        pDTO.setCodigoPais(pelicula.getPais().getCodigo());
-        pDTO.setTitulo(pelicula.getTitulo());
-        pDTO.setAnio(pelicula.getAnio());
-        pDTO.setDuracion(pelicula.getDuracion());
-
-        return pDTO;
-    }
-
-    public List<PeliculaDTO> peliculatoPeliculaDTO(
-            List<Pelicula> lstP){
-
-        List<PeliculaDTO> lstPDTO = new ArrayList<>();
-        for(Pelicula p : lstP){
-            lstPDTO.add(peliculatoPeliculaDTO(p));
-        }
-
-        return lstPDTO;
-    }
-
-    public Pelicula peliculaNuevaDTOtoPelicula(
-            PeliculaNuevaDTO pNDTO) {
-
-        Pelicula p = new Pelicula();
-        p.setTitulo(pNDTO.getTitulo());
-        p.setTituloCompacto(pNDTO.getTituloCompacto());
-        if(pNDTO.getCodigoPais() != null && !pNDTO.getCodigoPais().isBlank()){
-            Pais pais = paisRepository.findByCodigo(pNDTO.getCodigoPais());
+        p.setTituloCompacto(pDTO.getTituloCompacto());
+        if(pDTO.getCodigoPais() != null && !pDTO.getCodigoPais().isBlank()){
+            Pais pais = paisRepository.findByCodigo(pDTO.getCodigoPais());
             p.setPais(pais);
         }
-        p.setAnio(pNDTO.getAnio());
-        p.setDuracion(pNDTO.getDuracion());
-        p.setSinopsis(pNDTO.getSinopsis());
+        p.setAnio(pDTO.getAnio());
+        p.setDuracion(pDTO.getDuracion());
+        p.setSinopsis(pDTO.getSinopsis());
 
         return p;
     }
@@ -166,13 +122,26 @@ public class PeliculaMapper {
         pcDTO.setPuntuacionMedia(p.getPuntuacionMedia());
         pcDTO.setNumVotos(p.getNumVotos());
 
-        List<Genero> lstGeneros = generoRepository.findByIdPelicula(p.getId());
+        List<Genero> lstGeneros = generoRepository.findByIdPeliculaOrderByOrdenAsc(p.getId());
+        pcDTO.setLstGeneros(generoMapper.generotoGeneroDTO(lstGeneros));
 
-        Map<String, String> mapGeneros = new HashMap<>();
-        for(Genero g: lstGeneros){
-            mapGeneros.put(g.getCodigo(), g.getNombre());
-        }
-        pcDTO.setMapGeneros(mapGeneros);
+        List<Equipo> lstEquipoDireccion = equipoPeliculaRepository.findByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Direccion.getNombre());
+        pcDTO.setLstDireccion(equipoMapper.equipoToEquipoDTO(lstEquipoDireccion));
+
+        List<Equipo> lstEquipoGuion = equipoPeliculaRepository.findByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Guion.getNombre());
+        pcDTO.setLstGuion(equipoMapper.equipoToEquipoDTO(lstEquipoGuion));
+
+        List<Equipo> lstEquipoBandaSonora = equipoPeliculaRepository.findByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.BandaSonora.getNombre());
+        pcDTO.setLstBandaSonora(equipoMapper.equipoToEquipoDTO(lstEquipoBandaSonora));
+
+        List<Equipo> lstEquipoFotografia = equipoPeliculaRepository.findByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Fotografia.getNombre());
+        pcDTO.setLstFotografia(equipoMapper.equipoToEquipoDTO(lstEquipoFotografia));
+
+        List<Equipo> lstEquipoProduccion = equipoPeliculaRepository.findByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Produccion.getNombre());
+        pcDTO.setLstProduccion(equipoMapper.equipoToEquipoDTO(lstEquipoProduccion));
+
+        List<Equipo> lstEquipoReparto = equipoPeliculaRepository.findByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Reparto.getNombre());
+        pcDTO.setLstReparto(equipoMapper.equipoToEquipoDTO(lstEquipoReparto));
 
         List<Estado> lstEstado = estadoRepository.findByIdPeliculaAndCriticaIsNotNull(p.getId());
 
@@ -199,6 +168,43 @@ public class PeliculaMapper {
         paginaPeliculasMiniaturaDTO.setTotalPeliculas(pagePeliculas.getTotalElements());
 
         return paginaPeliculasMiniaturaDTO;
+    }
+
+    public PeliculaDTO peliculaToPeliculaDTO(
+            Pelicula p){
+
+        PeliculaDTO pDTO = new PeliculaDTO();
+
+        pDTO.setId(p.getId());
+        pDTO.setTitulo(p.getTitulo());
+        pDTO.setTituloCompacto(p.getTituloCompacto());
+        if(p.getPais() != null){
+            Optional<Pais> pais = paisRepository.findById(p.getPais().getId());
+            if(pais.isPresent()){
+                pDTO.setCodigoPais(pais.get().getCodigo());
+            }
+        }
+        pDTO.setAnio(p.getAnio());
+        pDTO.setDuracion(p.getDuracion());
+        pDTO.setSinopsis(p.getSinopsis());
+
+        List<String> lstGeneros = generoRepository.findNombreGeneroByIdPelicula(p.getId());
+        pDTO.setLstGeneros(lstGeneros);
+
+        List<String> lstDireccion = equipoPeliculaRepository.findNombreByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Direccion.getNombre());
+        pDTO.setLstDireccion(lstDireccion);
+        List<String> lstGuion = equipoPeliculaRepository.findNombreByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Guion.getNombre());
+        pDTO.setLstGuion(lstGuion);
+        List<String> lstBandaSonora = equipoPeliculaRepository.findNombreByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.BandaSonora.getNombre());
+        pDTO.setLstBandaSonora(lstBandaSonora);
+        List<String> lstFotografia = equipoPeliculaRepository.findNombreByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Fotografia.getNombre());
+        pDTO.setLstFotografia(lstFotografia);
+        List<String> lstProduccion = equipoPeliculaRepository.findNombreByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Produccion.getNombre());
+        pDTO.setLstProduccion(lstProduccion);
+        List<String> lstReparto = equipoPeliculaRepository.findNombreByIdPeliculaAndNombreSeccion(p.getId(), ESeccion.Reparto.getNombre());
+        pDTO.setLstReparto(lstReparto);
+
+        return pDTO;
     }
 
 }
